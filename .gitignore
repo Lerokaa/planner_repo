@@ -1,3 +1,35 @@
+# Дополнительно к вашему текущему содержимому:
+
+# Все файлы .idea (а не только перечисленные подпапки)
+/.idea/
+
+# Кэш Android Studio
+/.idea/caches/build_file_checksums.ser
+/.idea/misc.xml
+/.idea/runConfigurations/
+/.idea/gradle.xml
+/.idea/compiler.xml
+
+# Gradle кэш (полностью)
+.gradle/
+
+# Все build папки рекурсивно
+**/build/
+
+# Файлы подписи приложения (ВАЖНО!)
+*.jks
+*.keystore
+
+# Env файлы
+.env
+.env.production
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
 *.iml
 .gradle
 /local.properties
