@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Планнер - Тестирование функций"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="#2196F3"
+        android:textColor="@android:color/white" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- NOTE FUNCTIONS -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="=== ЗАМЕТКИ (NOTES) ==="
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:background="#E3F2FD"
+                android:padding="8dp"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/btn_create_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. Создать заметку"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_update_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2. Обновить первую заметку"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_delete_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="3. Удалить первую заметку"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_get_all_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="4. Показать все заметки"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_get_note_by_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="5. Найти заметку по ID"
+                android:layout_marginTop="4dp" />
+
+            <!-- TASK FUNCTIONS -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="=== ЗАДАЧИ (TASKS) ==="
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:background="#E8F5E9"
+                android:padding="8dp"
+                android:layout_marginTop="16dp" />
+
+            <Button
+                android:id="@+id/btn_create_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="6. Создать задачу"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_update_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="7. Обновить первую задачу"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_delete_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="8. Удалить первую задачу"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_get_all_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="9. Показать все задачи"
+                android:layout_marginTop="4dp" />
+
+            <!-- REMINDER FUNCTIONS -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="=== НАПОМИНАНИЯ (REMINDERS) ==="
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:background="#FFF3E0"
+                android:padding="8dp"
+                android:layout_marginTop="16dp" />
+
+            <Button
+                android:id="@+id/btn_create_reminder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10. Создать напоминание для первой задачи"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_get_reminders_for_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="11. Показать напоминания первой задачи"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_update_reminder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="12. Отметить первое напоминание как выполненное"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_delete_reminder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="13. Удалить первое напоминание"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_get_active_time_reminders"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="14. Показать активные TIME напоминания"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_get_active_location_reminders"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="15. Показать активные LOCATION напоминания"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_delete_all_reminders_for_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="16. Удалить все напоминания первой задачи"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_clear_output"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ОЧИСТИТЬ ВЫВОД"
+                android:layout_marginTop="16dp"
+                android:background="#F44336"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="РЕЗУЛЬТАТ ВЫПОЛНЕНИЯ:"
+        android:textStyle="bold"
+        android:background="#9E9E9E"
+        android:padding="4dp"
+        android:layout_marginTop="4dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#F5F5F5">
+
+        <TextView
+            android:id="@+id/tv_output"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:text="Готов к тестированию..." />
+    </ScrollView>
+
+</LinearLayout>

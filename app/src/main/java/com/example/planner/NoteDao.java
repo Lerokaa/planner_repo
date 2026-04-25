@@ -23,5 +23,5 @@ public interface NoteDao {
     List<Note> getAllNotes();
 
     @Query("SELECT * FROM notes WHERE id = :id")
-    Note getNoteById(int id);
+    Note getNoteById(long id);
 }

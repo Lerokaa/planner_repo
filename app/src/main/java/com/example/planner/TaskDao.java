@@ -22,4 +22,7 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks ORDER BY date ASC")
     List<Task> getAllTasks();
+
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    Task getTask(long id);
 }
