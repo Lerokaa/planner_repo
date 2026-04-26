@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_primary">#1F2532</color>
+    <color name="text_time">#8E8E93</color>
+    <color name="fab_background">#4B5C78</color>
+    <color name="fab_icon">#CCD2DE</color>
+    <color name="icon_tint">#1F2532</color>
+    <color name="divider">#E0E0E0</color>
+
+    <!-- Пастельные цвета для задач -->
+    <color name="task_blue_light">#D6E8FF</color>
+    <color name="task_pink_light">#FFD6D6</color>
+    <color name="task_green_light">#D6F5D6</color>
+    <color name="task_yellow_light">#FFF3D6</color>
+    <color name="task_purple_light">#E8D6FF</color>
+
+    <color name="dark_text">#1F2532</color>
+    <color name="light_text">#4B5C78</color>
+    <color name="gray">#8E8E93</color>
+    <color name="red">#FF3B30</color>
+
+    <color name="color_next_button">#4B5C78</color>
+    <color name="color_start_button">#1F2532</color>
 </resources>

@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Левая гора -->
+    <path
+        android:pathData="M 15 80 C 15 80 30 50 45 60"
+        android:strokeWidth="4"
+        android:strokeColor="#1F2532"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Правая гора (с флагом) -->
+    <path
+        android:pathData="M 45 60 C 60 20 70 20 85 80"
+        android:strokeWidth="4"
+        android:strokeColor="#1F2532"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Флаг -->
+    <path
+        android:pathData="M 65 20 L 65 5 L 85 10 Z"
+        android:strokeWidth="4"
+        android:strokeColor="#1F2532"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+</vector>
