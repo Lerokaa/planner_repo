@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_habits"
+        android:icon="@drawable/ic_habits"
+        android:title="Привычки" />
+
+    <item
+        android:id="@+id/nav_tasks"
+        android:icon="@drawable/ic_tasks"
+        android:title="Задачи" />
+
+    <item
+        android:id="@+id/nav_calendar"
+        android:icon="@drawable/ic_calendar_icon"
+        android:title="Календарь" />
+
+    <item
+        android:id="@+id/nav_notes"
+        android:icon="@drawable/ic_notes"
+        android:title="Заметки" />
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Настройки" />
+
+</menu>

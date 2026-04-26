@@ -1,0 +1,45 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Булавка сверху -->
+    <path
+        android:pathData="M 50 12 A 3 3 0 1 0 50 6 A 3 3 0 1 0 50 12"
+        android:strokeWidth="4"
+        android:strokeColor="#1F2532"
+        android:fillColor="#00000000" />
+    <!-- Контур бумаги -->
+    <path
+        android:pathData="M 25 15 L 75 15 L 75 70 L 55 85 L 25 85 Z"
+        android:strokeWidth="4"
+        android:strokeColor="#1F2532"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <!-- Загнутый уголок -->
+    <path
+        android:pathData="M 75 70 L 55 85 L 55 70 Z"
+        android:strokeWidth="4"
+        android:strokeColor="#1F2532"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <!-- Текстовые линии (волнистые) -->
+    <path
+        android:pathData="M 35 35 Q 50 30 65 35"
+        android:strokeWidth="3"
+        android:strokeColor="#1F2532"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M 30 50 Q 50 45 70 50"
+        android:strokeWidth="3"
+        android:strokeColor="#1F2532"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M 30 65 Q 45 60 60 65"
+        android:strokeWidth="3"
+        android:strokeColor="#1F2532"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+</vector>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/splash_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/splash_background">
+
+    <!-- Контейнер для объединения "your" и "Planner" -->
+    <LinearLayout
+        android:id="@+id/logoContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Текст "your" (выровнен по ПРАВОМУ краю контейнера) -->
+        <TextView
+            android:id="@+id/tvYour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:fontFamily="@font/kaushan_script"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-4dp"
+            android:text="your"
+            android:textColor="#4B5C78"
+            android:textSize="48sp"
+            app:autoSizeMaxTextSize="60sp"
+            app:autoSizeMinTextSize="24sp"
+            app:autoSizeStepGranularity="2sp"
+            app:autoSizeTextType="uniform" />
+
+        <!-- Текст "Planner" (по центру или слева — настройте layout_gravity при необходимости) -->
+        <TextView
+            android:id="@+id/tvPlanner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-8dp"
+            android:fontFamily="@font/kaushan_script"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-4dp"
+            android:text="Planner"
+            android:textColor="#1F2532"
+            android:textSize="60sp"
+            app:autoSizeMaxTextSize="70sp"
+            app:autoSizeMinTextSize="28sp"
+            app:autoSizeStepGranularity="2sp"
+            app:autoSizeTextType="uniform" />
+
+    </LinearLayout>
+
+    <!-- Год внизу -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="2026"
+        android:textColor="#1F2532"
+        android:textSize="14sp" />
+
+</RelativeLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Базовая тема приложения -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="colorPrimary">#4B5C78</item>
+        <item name="colorPrimaryDark">#4B5C78</item>
+        <item name="colorAccent">#4B5C78</item>
+    </style>
+
+    <!-- Стиль для текста навигации -->
+    <style name="BottomNavText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">#1F2532</item>
+    </style>
+
+    <!-- Стиль для круглой FAB кнопки -->
+    <style name="CircularFloatingActionButton" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+</resources>
