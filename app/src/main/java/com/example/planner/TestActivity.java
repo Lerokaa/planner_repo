@@ -13,6 +13,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
+import java.util.Calendar;
+
 public class TestActivity extends AppCompatActivity {
 
     private AppDatabase db;
@@ -39,33 +45,31 @@ public class TestActivity extends AppCompatActivity {
 
     private void setupButtons() {
         findViewById(R.id.btn_create_note).setOnClickListener(v -> showCreateNoteDialog());
-        findViewById(R.id.btn_update_note).setOnClickListener(v -> updateNote());
-        findViewById(R.id.btn_delete_note).setOnClickListener(v -> deleteNote());
+        findViewById(R.id.btn_update_note).setOnClickListener(v -> showUpdateNoteDialog());
+        findViewById(R.id.btn_delete_note).setOnClickListener(v -> showDeleteNoteDialog());
         findViewById(R.id.btn_get_all_notes).setOnClickListener(v -> getAllNotes());
-        findViewById(R.id.btn_get_note_by_id).setOnClickListener(v -> getNoteById());
+        findViewById(R.id.btn_get_note_by_id).setOnClickListener(v -> showGetNoteByIdDialog());
 
-        // TASK FUNCTIONS
-        findViewById(R.id.btn_create_task).setOnClickListener(v -> createTask());
-        findViewById(R.id.btn_update_task).setOnClickListener(v -> updateTask());
-        findViewById(R.id.btn_delete_task).setOnClickListener(v -> deleteTask());
+        findViewById(R.id.btn_create_task).setOnClickListener(v -> showCreateTaskDialog());
+        findViewById(R.id.btn_complete_task).setOnClickListener(v -> showCompleteTaskDialog());
+        findViewById(R.id.btn_update_task).setOnClickListener(v -> showUpdateTaskDialog());
+        findViewById(R.id.btn_delete_task).setOnClickListener(v -> showDeleteTaskDialog());
         findViewById(R.id.btn_get_all_tasks).setOnClickListener(v -> getAllTasks());
 
-        // REMINDER FUNCTIONS
-        findViewById(R.id.btn_create_reminder).setOnClickListener(v -> createReminder());
-        findViewById(R.id.btn_get_reminders_for_task).setOnClickListener(v -> getRemindersForTask());
-        findViewById(R.id.btn_update_reminder).setOnClickListener(v -> updateReminder());
-        findViewById(R.id.btn_delete_reminder).setOnClickListener(v -> deleteReminder());
+        findViewById(R.id.btn_create_reminder).setOnClickListener(v -> showCreateReminderDialog());
+        findViewById(R.id.btn_get_reminders_for_task).setOnClickListener(v -> showGetRemindersForTaskDialog());
+        findViewById(R.id.btn_update_reminder).setOnClickListener(v -> showUpdateReminderDialog());
+        findViewById(R.id.btn_delete_reminder).setOnClickListener(v -> showDeleteReminderDialog());
         findViewById(R.id.btn_get_active_time_reminders).setOnClickListener(v -> getActiveTimeReminders());
         findViewById(R.id.btn_get_active_location_reminders).setOnClickListener(v -> getActiveLocationReminders());
-        findViewById(R.id.btn_delete_all_reminders_for_task).setOnClickListener(v -> deleteAllRemindersForTask());
+        findViewById(R.id.btn_delete_all_reminders_for_task).setOnClickListener(v -> showDeleteAllRemindersForTaskDialog());
 
-        // UTILITY
         findViewById(R.id.btn_clear_output).setOnClickListener(v -> clearOutput());
     }
 
     private void showCreateNoteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("📝 Создание заметки");
+        builder.setTitle("Создание заметки");
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -74,7 +78,6 @@ public class TestActivity extends AppCompatActivity {
         TextView titleLabel = new TextView(this);
         titleLabel.setText("Заголовок:");
         titleLabel.setTextSize(14);
-        titleLabel.setTextColor(getResources().getColor(android.R.color.black));
         layout.addView(titleLabel);
 
         final EditText titleInput = new EditText(this);
@@ -85,7 +88,6 @@ public class TestActivity extends AppCompatActivity {
         TextView contentLabel = new TextView(this);
         contentLabel.setText("Содержание:");
         contentLabel.setTextSize(14);
-        contentLabel.setTextColor(getResources().getColor(android.R.color.black));
         contentLabel.setPadding(0, 20, 0, 0);
         layout.addView(contentLabel);
 
@@ -115,7 +117,6 @@ public class TestActivity extends AppCompatActivity {
         });
 
         builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
-
         builder.show();
     }
 
@@ -129,8 +130,7 @@ public class TestActivity extends AppCompatActivity {
             noteDao.insert(note);
 
             runOnUiThread(() -> {
-                appendOutput(" СОЗДАНА ЗАМЕТКА");
-                appendOutput("   ID: " + note.id);
+                appendOutput("СОЗДАНА ЗАМЕТКА");
                 appendOutput("   Заголовок: " + note.title);
                 appendOutput("   Содержание: " + note.content);
                 appendOutput("   Дата создания: " + sdf.format(new Date(note.lastModified)));
@@ -140,40 +140,164 @@ public class TestActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void updateNote() {
-        new Thread(() -> {
-            List<Note> notes = noteDao.getAllNotes();
-            if (notes.isEmpty()) {
-                runOnUiThread(() -> appendOutput("НЕТ ЗАМЕТОК ДЛЯ ОБНОВЛЕНИЯ\n"));
+    private void showUpdateNoteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Обновление заметки");
+        builder.setMessage("Введите ID заметки для обновления:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID заметки");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Далее", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID заметки", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Note note = notes.get(0);
-            String oldTitle = note.title;
-            note.title = "ОБНОВЛЕНО: " + oldTitle;
-            note.lastModified = System.currentTimeMillis();
-            noteDao.update(note);
+            try {
+                long noteId = Long.parseLong(idStr);
+                showUpdateNoteFormDialog(noteId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void showUpdateNoteFormDialog(long noteId) {
+        new Thread(() -> {
+            Note existingNote = noteDao.getNoteById((int) noteId);
+            if (existingNote == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАМЕТКА С ID " + noteId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Заметка не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
 
             runOnUiThread(() -> {
-                appendOutput("ЗАМЕТКА ОБНОВЛЕНА");
-                appendOutput("   ID: " + note.id);
-                appendOutput("   Было: " + oldTitle);
-                appendOutput("   Стало: " + note.title);
-                appendOutput("   Дата изменения: " + sdf.format(new Date(note.lastModified)));
-                appendOutput("");
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Обновление заметки ID: " + noteId);
+
+                LinearLayout layout = new LinearLayout(this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setPadding(50, 40, 50, 40);
+
+                TextView titleLabel = new TextView(this);
+                titleLabel.setText("Новый заголовок:");
+                titleLabel.setTextSize(14);
+                layout.addView(titleLabel);
+
+                final EditText titleInput = new EditText(this);
+                titleInput.setText(existingNote.title);
+                titleInput.setPadding(0, 10, 0, 20);
+                layout.addView(titleInput);
+
+                TextView contentLabel = new TextView(this);
+                contentLabel.setText("Новое содержание:");
+                contentLabel.setTextSize(14);
+                contentLabel.setPadding(0, 20, 0, 0);
+                layout.addView(contentLabel);
+
+                final EditText contentInput = new EditText(this);
+                contentInput.setText(existingNote.content);
+                contentInput.setPadding(0, 10, 0, 20);
+                contentInput.setMinLines(3);
+                layout.addView(contentInput);
+
+                builder.setView(layout);
+
+                builder.setPositiveButton("Обновить", (dialog, which) -> {
+                    String newTitle = titleInput.getText().toString().trim();
+                    String newContent = contentInput.getText().toString().trim();
+
+                    if (newTitle.isEmpty()) {
+                        Toast.makeText(this, "Введите заголовок заметки", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (newContent.isEmpty()) {
+                        Toast.makeText(this, "Введите содержание заметки", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    updateNoteById(noteId, newTitle, newContent);
+                });
+
+                builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+                builder.show();
             });
         }).start();
     }
 
-    private void deleteNote() {
+    private void updateNoteById(long noteId, String newTitle, String newContent) {
         new Thread(() -> {
-            List<Note> notes = noteDao.getAllNotes();
-            if (notes.isEmpty()) {
-                runOnUiThread(() -> appendOutput("НЕТ ЗАМЕТОК ДЛЯ УДАЛЕНИЯ\n"));
+            Note note = noteDao.getNoteById((int) noteId);
+            if (note != null) {
+                String oldTitle = note.title;
+                note.title = newTitle;
+                note.content = newContent;
+                note.lastModified = System.currentTimeMillis();
+                noteDao.update(note);
+
+                runOnUiThread(() -> {
+                    appendOutput("ЗАМЕТКА ОБНОВЛЕНА");
+                    appendOutput("   ID: " + note.id);
+                    appendOutput("   Было: " + oldTitle);
+                    appendOutput("   Стало: " + note.title);
+                    appendOutput("   Дата изменения: " + sdf.format(new Date(note.lastModified)));
+                    appendOutput("");
+                    Toast.makeText(this, "Заметка обновлена", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
+
+    private void showDeleteNoteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Удаление заметки");
+        builder.setMessage("Введите ID заметки для удаления:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID заметки");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Удалить", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID заметки", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Note note = notes.get(0);
+            try {
+                long noteId = Long.parseLong(idStr);
+                deleteNoteById(noteId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void deleteNoteById(long noteId) {
+        new Thread(() -> {
+            Note note = noteDao.getNoteById((int) noteId);
+            if (note == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАМЕТКА С ID " + noteId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Заметка не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
             noteDao.delete(note);
 
             runOnUiThread(() -> {
@@ -181,6 +305,7 @@ public class TestActivity extends AppCompatActivity {
                 appendOutput("   ID: " + note.id);
                 appendOutput("   Заголовок: " + note.title);
                 appendOutput("");
+                Toast.makeText(this, "Заметка удалена", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
@@ -189,12 +314,12 @@ public class TestActivity extends AppCompatActivity {
         new Thread(() -> {
             List<Note> notes = noteDao.getAllNotes();
             runOnUiThread(() -> {
-                appendOutput("📝 ВСЕ ЗАМЕТКИ (" + notes.size() + " шт.)");
+                appendOutput("ВСЕ ЗАМЕТКИ (" + notes.size() + " шт.)");
                 if (notes.isEmpty()) {
                     appendOutput("   Нет заметок");
                 } else {
                     for (Note note : notes) {
-                        appendOutput("   • ID:" + note.id + " | " + note.title);
+                        appendOutput("   ID:" + note.id + " | " + note.title);
                         appendOutput("     Содержание: " + (note.content.length() > 50 ? note.content.substring(0, 50) + "..." : note.content));
                         appendOutput("     Изменено: " + sdf.format(new Date(note.lastModified)));
                     }
@@ -204,18 +329,40 @@ public class TestActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void getNoteById() {
+    private void showGetNoteByIdDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Поиск заметки");
+        builder.setMessage("Введите ID заметки:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID заметки");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Найти", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID заметки", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                long noteId = Long.parseLong(idStr);
+                getNoteById(noteId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void getNoteById(long noteId) {
         new Thread(() -> {
-            Note newNote = new Note();
-            newNote.title = "Тестовая заметка для поиска";
-            newNote.content = "Содержимое для поиска по ID";
-            newNote.lastModified = System.currentTimeMillis();
-            noteDao.insert(newNote);
-
-            Note found = noteDao.getNoteById(newNote.id);
-
+            Note found = noteDao.getNoteById((int) noteId);
             runOnUiThread(() -> {
-                appendOutput(" ПОИСК ЗАМЕТКИ ПО ID: " + newNote.id);
+                appendOutput("ПОИСК ЗАМЕТКИ ПО ID: " + noteId);
                 if (found != null) {
                     appendOutput("НАЙДЕНО:");
                     appendOutput("   ID: " + found.id);
@@ -230,61 +377,388 @@ public class TestActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void showCreateTaskDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Создание задачи");
 
-    private void createTask() {
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 40);
+
+        TextView titleLabel = new TextView(this);
+        titleLabel.setText("Название задачи:");
+        titleLabel.setTextSize(14);
+        layout.addView(titleLabel);
+
+        final EditText titleInput = new EditText(this);
+        titleInput.setHint("Введите название задачи");
+        titleInput.setPadding(0, 10, 0, 20);
+        layout.addView(titleInput);
+
+        TextView contentLabel = new TextView(this);
+        contentLabel.setText("Описание:");
+        contentLabel.setTextSize(14);
+        contentLabel.setPadding(0, 20, 0, 0);
+        layout.addView(contentLabel);
+
+        final EditText contentInput = new EditText(this);
+        contentInput.setHint("Введите описание задачи");
+        contentInput.setPadding(0, 10, 0, 20);
+        contentInput.setMinLines(3);
+        layout.addView(contentInput);
+
+        TextView dateTimeLabel = new TextView(this);
+        dateTimeLabel.setText("Дата и время (необязательно):");
+        dateTimeLabel.setTextSize(14);
+        dateTimeLabel.setPadding(0, 20, 0, 0);
+        layout.addView(dateTimeLabel);
+
+        LinearLayout dateTimeLayout = new LinearLayout(this);
+        dateTimeLayout.setOrientation(LinearLayout.HORIZONTAL);
+        dateTimeLayout.setPadding(0, 10, 0, 0);
+
+        final Calendar calendar = Calendar.getInstance();
+
+        LinearLayout dateLayout = new LinearLayout(this);
+        dateLayout.setOrientation(LinearLayout.VERTICAL);
+        dateLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+        final TextView dateLabel = new TextView(this);
+        dateLabel.setText("Дата:");
+        dateLabel.setTextSize(12);
+        dateLayout.addView(dateLabel);
+
+        final Button dateButton = new Button(this);
+        dateButton.setText("Не выбрана");
+        dateButton.setOnClickListener(v -> {
+            DatePickerDialog datePicker = new DatePickerDialog(this,
+                    (DatePicker view, int year, int month, int dayOfMonth) -> {
+                        calendar.set(year, month, dayOfMonth);
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                        dateButton.setText(dateFormat.format(calendar.getTime()));
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH));
+            datePicker.show();
+        });
+        dateLayout.addView(dateButton);
+
+        LinearLayout timeLayout = new LinearLayout(this);
+        timeLayout.setOrientation(LinearLayout.VERTICAL);
+        timeLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+        final TextView timeLabel = new TextView(this);
+        timeLabel.setText("Время:");
+        timeLabel.setTextSize(12);
+        timeLayout.addView(timeLabel);
+
+        final Button timeButton = new Button(this);
+        timeButton.setText("Не выбрано");
+        timeButton.setOnClickListener(v -> {
+            TimePickerDialog timePicker = new TimePickerDialog(this,
+                    (TimePicker view, int hourOfDay, int minute) -> {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                        timeButton.setText(timeFormat.format(calendar.getTime()));
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true);
+            timePicker.show();
+        });
+        timeLayout.addView(timeButton);
+
+        dateTimeLayout.addView(dateLayout);
+        dateTimeLayout.addView(timeLayout);
+        layout.addView(dateTimeLayout);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Создать", (dialog, which) -> {
+            String title = titleInput.getText().toString().trim();
+            String content = contentInput.getText().toString().trim();
+
+            if (title.isEmpty()) {
+                Toast.makeText(this, "Введите название задачи", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            boolean hasDate = !dateButton.getText().toString().equals("Не выбрана");
+            boolean hasTime = !timeButton.getText().toString().equals("Не выбрано");
+
+            Long selectedDateTime = null;
+            if (hasDate && hasTime) {
+                selectedDateTime = calendar.getTimeInMillis();
+            } else if (hasDate && !hasTime) {
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                selectedDateTime = calendar.getTimeInMillis();
+            } else if (!hasDate && hasTime) {
+                Calendar tempCal = Calendar.getInstance();
+                tempCal.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
+                tempCal.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
+                tempCal.set(Calendar.SECOND, 0);
+                selectedDateTime = tempCal.getTimeInMillis();
+            }
+
+            createTask(title, content, selectedDateTime);
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void createTask(String title, String content, Long dateTime) {
         new Thread(() -> {
             Task task = new Task();
-            task.title = "Задача " + sdf.format(new Date());
-            task.content = "Описание задачи";
-            task.date = System.currentTimeMillis();
-            task.time = System.currentTimeMillis();
+            task.title = title;
+            task.content = content;
             task.isCompleted = false;
+
+            if (dateTime != null) {
+                task.date = dateTime;
+                task.time = dateTime;
+            } else {
+                task.date = null;
+                task.time = null;
+            }
 
             taskDao.insert(task);
 
             runOnUiThread(() -> {
-                appendOutput(" СОЗДАНА ЗАДАЧА");
-                appendOutput("   ID: " + task.id);
+                appendOutput("СОЗДАНА ЗАДАЧА");
                 appendOutput("   Название: " + task.title);
-                appendOutput("   Выполнена: " + (task.isCompleted ? "Да" : "Нет"));
+                appendOutput("   Описание: " + task.content);
+                if (dateTime != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+                    appendOutput("   Дата и время: " + sdf.format(new Date(dateTime)));
+                } else {
+                    appendOutput("   Дата и время: не установлены");
+                }
+                appendOutput("   Статус: Не выполнена");
                 appendOutput("");
                 Toast.makeText(this, "Задача создана", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
 
-    private void updateTask() {
-        new Thread(() -> {
-            List<Task> tasks = taskDao.getAllTasks();
-            if (tasks.isEmpty()) {
-                runOnUiThread(() -> appendOutput("НЕТ ЗАДАЧ ДЛЯ ОБНОВЛЕНИЯ\n"));
+    private void showCompleteTaskDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Отметить выполнение задачи");
+        builder.setMessage("Введите ID задачи для отметки как выполненной:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID задачи");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Отметить", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID задачи", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Task task = tasks.get(0);
-            task.title = "ОБНОВЛЕНО: " + task.title;
-            task.isCompleted = !task.isCompleted;
-            taskDao.update(task);
+            try {
+                long taskId = Long.parseLong(idStr);
+                markTaskAsCompleted(taskId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void markTaskAsCompleted(long taskId) {
+        new Thread(() -> {
+            Task task = taskDao.getTask(taskId);
+
+            if (task == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            if (task.isCompleted) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА УЖЕ ВЫПОЛНЕНА");
+                    appendOutput("   ID: " + task.id);
+                    appendOutput("   Название: " + task.title);
+                    appendOutput("");
+                    Toast.makeText(this, "Задача уже выполнена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            taskDao.updateTaskCompletion(task.id, true);
 
             runOnUiThread(() -> {
-                appendOutput(" ЗАДАЧА ОБНОВЛЕНА");
+                appendOutput("ЗАДАЧА ОТМЕЧЕНА КАК ВЫПОЛНЕННАЯ");
                 appendOutput("   ID: " + task.id);
-                appendOutput("   Новое название: " + task.title);
-                appendOutput("   Статус выполнения: " + (task.isCompleted ? "Выполнена " : "Не выполнена "));
+                appendOutput("   Название: " + task.title);
                 appendOutput("");
+                Toast.makeText(this, "Задача " + task.id + " отмечена как выполненная", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
 
-    private void deleteTask() {
-        new Thread(() -> {
-            List<Task> tasks = taskDao.getAllTasks();
-            if (tasks.isEmpty()) {
-                runOnUiThread(() -> appendOutput(" НЕТ ЗАДАЧ ДЛЯ УДАЛЕНИЯ\n"));
+    private void showUpdateTaskDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Обновление задачи");
+        builder.setMessage("Введите ID задачи для обновления:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID задачи");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Далее", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID задачи", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Task task = tasks.get(0);
+            try {
+                long taskId = Long.parseLong(idStr);
+                showUpdateTaskFormDialog(taskId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void showUpdateTaskFormDialog(long taskId) {
+        new Thread(() -> {
+            Task existingTask = taskDao.getTask(taskId);
+            if (existingTask == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            runOnUiThread(() -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Обновление задачи ID: " + taskId);
+
+                LinearLayout layout = new LinearLayout(this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setPadding(50, 40, 50, 40);
+
+                TextView titleLabel = new TextView(this);
+                titleLabel.setText("Новое название:");
+                titleLabel.setTextSize(14);
+                layout.addView(titleLabel);
+
+                final EditText titleInput = new EditText(this);
+                titleInput.setText(existingTask.title);
+                titleInput.setPadding(0, 10, 0, 20);
+                layout.addView(titleInput);
+
+                TextView contentLabel = new TextView(this);
+                contentLabel.setText("Новое описание:");
+                contentLabel.setTextSize(14);
+                contentLabel.setPadding(0, 20, 0, 0);
+                layout.addView(contentLabel);
+
+                final EditText contentInput = new EditText(this);
+                contentInput.setText(existingTask.content);
+                contentInput.setPadding(0, 10, 0, 20);
+                contentInput.setMinLines(3);
+                layout.addView(contentInput);
+
+                builder.setView(layout);
+
+                builder.setPositiveButton("Обновить", (dialog, which) -> {
+                    String newTitle = titleInput.getText().toString().trim();
+                    String newContent = contentInput.getText().toString().trim();
+
+                    if (newTitle.isEmpty()) {
+                        Toast.makeText(this, "Введите название задачи", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    updateTaskById(taskId, newTitle, newContent);
+                });
+
+                builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+                builder.show();
+            });
+        }).start();
+    }
+
+    private void updateTaskById(long taskId, String newTitle, String newContent) {
+        new Thread(() -> {
+            Task task = taskDao.getTask(taskId);
+            if (task != null) {
+                task.title = newTitle;
+                task.content = newContent;
+                taskDao.update(task);
+
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА ОБНОВЛЕНА");
+                    appendOutput("   ID: " + task.id);
+                    appendOutput("   Новое название: " + task.title);
+                    appendOutput("   Новое описание: " + task.content);
+                    appendOutput("");
+                    Toast.makeText(this, "Задача обновлена", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
+
+    private void showDeleteTaskDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Удаление задачи");
+        builder.setMessage("Введите ID задачи для удаления:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID задачи");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Удалить", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID задачи", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                long taskId = Long.parseLong(idStr);
+                deleteTaskById(taskId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void deleteTaskById(long taskId) {
+        new Thread(() -> {
+            Task task = taskDao.getTask(taskId);
+            if (task == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
             reminderDao.deleteByTaskId(task.id);
             taskDao.delete(task);
 
@@ -293,6 +767,7 @@ public class TestActivity extends AppCompatActivity {
                 appendOutput("   ID: " + task.id);
                 appendOutput("   Название: " + task.title);
                 appendOutput("");
+                Toast.makeText(this, "Задача удалена", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
@@ -306,9 +781,9 @@ public class TestActivity extends AppCompatActivity {
                     appendOutput("   Нет задач");
                 } else {
                     for (Task task : tasks) {
-                        appendOutput("   • ID:" + task.id + " | " + task.title);
+                        appendOutput("   ID:" + task.id + " | " + task.title);
                         appendOutput("     Статус: " + (task.isCompleted ? "Выполнена" : "Не выполнена"));
-                        appendOutput("     Дата: " + (task.date != null ? sdf.format(new Date(task.date)) : "не указана"));
+                        appendOutput("     Описание: " + (task.content.length() > 50 ? task.content.substring(0, 50) + "..." : task.content));
                     }
                 }
                 appendOutput("");
@@ -316,68 +791,285 @@ public class TestActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void showCreateReminderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Создание напоминания");
+        builder.setMessage("Введите ID задачи для создания напоминания:");
 
-    private void createReminder() {
-        new Thread(() -> {
-            List<Task> tasks = taskDao.getAllTasks();
-            if (tasks.isEmpty()) {
-                runOnUiThread(() -> appendOutput(" СНАЧАЛА СОЗДАЙТЕ ЗАДАЧУ\n"));
+        final EditText input = new EditText(this);
+        input.setHint("ID задачи");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Далее", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID задачи", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Task task = tasks.get(0);
-            int count = reminderDao.getCountForTask(task.id);
+            try {
+                long taskId = Long.parseLong(idStr);
+                showReminderTypeDialog(taskId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
 
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void showReminderTypeDialog(long taskId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Тип напоминания");
+        builder.setItems(new String[]{"TIME (Временное)", "LOCATION (Гео)"}, (dialog, which) -> {
+            if (which == 0) {
+                showTimeReminderDialog(taskId);
+            } else {
+                showLocationReminderDialog(taskId);
+            }
+        });
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void showTimeReminderDialog(long taskId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Временное напоминание");
+        builder.setMessage("Введите задержку в минутах:");
+
+        final EditText input = new EditText(this);
+        input.setHint("Минуты");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Создать", (dialog, which) -> {
+            String minutesStr = input.getText().toString().trim();
+            if (minutesStr.isEmpty()) {
+                Toast.makeText(this, "Введите задержку", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                int minutes = Integer.parseInt(minutesStr);
+                createTimeReminder(taskId, minutes);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректное число", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void createTimeReminder(long taskId, int minutes) {
+        new Thread(() -> {
+            Task task = taskDao.getTask(taskId);
+            if (task == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            int count = reminderDao.getCountForTask(taskId);
             if (count >= 5) {
                 runOnUiThread(() -> {
-                    appendOutput(" ЛИМИТ! У задачи уже есть " + count + " напоминаний (макс. 5)");
+                    appendOutput("ЛИМИТ! У задачи уже есть " + count + " напоминаний (макс. 5)");
                     appendOutput("");
                 });
                 return;
             }
 
             Reminder reminder = new Reminder();
-            reminder.taskId = task.id;
+            reminder.taskId = taskId;
             reminder.type = "TIME";
-            reminder.triggerTime = System.currentTimeMillis() + 60000;
+            reminder.triggerTime = System.currentTimeMillis() + (minutes * 60 * 1000);
             reminder.isTriggered = false;
 
             long id = reminderDao.insert(reminder);
 
             runOnUiThread(() -> {
-                appendOutput(" СОЗДАНО НАПОМИНАНИЕ");
-                appendOutput("   ID: " + id);
-                appendOutput("   Для задачи ID: " + task.id + " (" + task.title + ")");
+                appendOutput("СОЗДАНО НАПОМИНАНИЕ");
+                appendOutput("   Для задачи ID: " + taskId + " (" + task.title + ")");
                 appendOutput("   Тип: TIME");
-                appendOutput("   Сработает: " + sdf.format(new Date(reminder.triggerTime)));
+                appendOutput("   Сработает через: " + minutes + " мин.");
                 appendOutput("   Напоминаний у задачи: " + (count + 1) + "/5");
                 appendOutput("");
+                Toast.makeText(this, "Напоминание создано", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
 
-    private void getRemindersForTask() {
+    private void showLocationReminderDialog(long taskId) {
+        runOnUiThread(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Гео-напоминание");
+
+            LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.setPadding(50, 40, 50, 40);
+
+            TextView latLabel = new TextView(this);
+            latLabel.setText("Широта:");
+            latLabel.setTextSize(14);
+            layout.addView(latLabel);
+
+            final EditText latInput = new EditText(this);
+            latInput.setHint("55.7558");
+            latInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            layout.addView(latInput);
+
+            TextView lngLabel = new TextView(this);
+            lngLabel.setText("Долгота:");
+            lngLabel.setTextSize(14);
+            lngLabel.setPadding(0, 20, 0, 0);
+            layout.addView(lngLabel);
+
+            final EditText lngInput = new EditText(this);
+            lngInput.setHint("37.6176");
+            lngInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            layout.addView(lngInput);
+
+            TextView radiusLabel = new TextView(this);
+            radiusLabel.setText("Радиус (метры):");
+            radiusLabel.setTextSize(14);
+            radiusLabel.setPadding(0, 20, 0, 0);
+            layout.addView(radiusLabel);
+
+            final EditText radiusInput = new EditText(this);
+            radiusInput.setHint("500");
+            radiusInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            layout.addView(radiusInput);
+
+            builder.setView(layout);
+
+            builder.setPositiveButton("Создать", (dialog, which) -> {
+                String latStr = latInput.getText().toString().trim();
+                String lngStr = lngInput.getText().toString().trim();
+                String radiusStr = radiusInput.getText().toString().trim();
+
+                if (latStr.isEmpty() || lngStr.isEmpty() || radiusStr.isEmpty()) {
+                    Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                try {
+                    double lat = Double.parseDouble(latStr);
+                    double lng = Double.parseDouble(lngStr);
+                    float radius = Float.parseFloat(radiusStr);
+                    createLocationReminder(taskId, lat, lng, radius);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(this, "Введите корректные значения", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+            builder.show();
+        });
+    }
+
+    private void createLocationReminder(long taskId, double lat, double lng, float radius) {
         new Thread(() -> {
-            List<Task> tasks = taskDao.getAllTasks();
-            if (tasks.isEmpty()) {
-                runOnUiThread(() -> appendOutput("НЕТ ЗАДАЧ\n"));
+            Task task = taskDao.getTask(taskId);
+            if (task == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
                 return;
             }
 
-            Task task = tasks.get(0);
-            List<Reminder> reminders = reminderDao.getRemindersForTask(task.id);
+            int count = reminderDao.getCountForTask(taskId);
+            if (count >= 5) {
+                runOnUiThread(() -> {
+                    appendOutput("ЛИМИТ! У задачи уже есть " + count + " напоминаний (макс. 5)");
+                    appendOutput("");
+                });
+                return;
+            }
+
+            Reminder reminder = new Reminder();
+            reminder.taskId = taskId;
+            reminder.type = "LOCATION";
+            reminder.lat = lat;
+            reminder.lng = lng;
+            reminder.radius = radius;
+            reminder.isTriggered = false;
+
+            long id = reminderDao.insert(reminder);
 
             runOnUiThread(() -> {
-                appendOutput("НАПОМИНАНИЯ ЗАДАЧИ: " + task.title + " (ID: " + task.id + ")");
+                appendOutput("СОЗДАНО НАПОМИНАНИЕ");
+                appendOutput("   ID: " + id);
+                appendOutput("   Для задачи ID: " + taskId + " (" + task.title + ")");
+                appendOutput("   Тип: LOCATION");
+                appendOutput("   Координаты: (" + lat + ", " + lng + ")");
+                appendOutput("   Радиус: " + radius + " м");
+                appendOutput("   Напоминаний у задачи: " + (count + 1) + "/5");
+                appendOutput("");
+                Toast.makeText(this, "Напоминание создано", Toast.LENGTH_SHORT).show();
+            });
+        }).start();
+    }
+
+    private void showGetRemindersForTaskDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Напоминания задачи");
+        builder.setMessage("Введите ID задачи:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID задачи");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Показать", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID задачи", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                long taskId = Long.parseLong(idStr);
+                getRemindersForTask(taskId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void getRemindersForTask(long taskId) {
+        new Thread(() -> {
+            Task task = taskDao.getTask(taskId);
+            if (task == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            List<Reminder> reminders = reminderDao.getRemindersForTask(taskId);
+
+            runOnUiThread(() -> {
+                appendOutput("НАПОМИНАНИЯ ЗАДАЧИ: " + task.title + " (ID: " + taskId + ")");
                 if (reminders.isEmpty()) {
                     appendOutput("   Нет напоминаний");
                 } else {
                     for (Reminder r : reminders) {
-                        appendOutput("   • ID:" + r.id + " | Тип: " + r.type);
+                        appendOutput("   ID:" + r.id + " | Тип: " + r.type);
                         if ("TIME".equals(r.type)) {
                             appendOutput("     Время: " + sdf.format(new Date(r.triggerTime)));
+                        } else if ("LOCATION".equals(r.type)) {
+                            appendOutput("     Локация: (" + r.lat + ", " + r.lng + ") радиус: " + r.radius + "м");
                         }
-                        appendOutput("     Выполнено: " + (r.isTriggered ? " Да" : " Нет"));
+                        appendOutput("     Выполнено: " + (r.isTriggered ? "Да" : "Нет"));
                     }
                 }
                 appendOutput("");
@@ -385,49 +1077,126 @@ public class TestActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void updateReminder() {
-        new Thread(() -> {
-            List<Reminder> reminders = reminderDao.getActiveTimeReminders();
-            if (reminders.isEmpty()) {
-                runOnUiThread(() -> appendOutput(" НЕТ АКТИВНЫХ TIME-НАПОМИНАНИЙ\n"));
+    private void showUpdateReminderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Отметить напоминание");
+        builder.setMessage("Введите ID напоминания для отметки как выполненного:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID напоминания");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Отметить", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID напоминания", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Reminder reminder = reminders.get(0);
-            reminder.isTriggered = true;
-            reminderDao.update(reminder);
+            try {
+                long reminderId = Long.parseLong(idStr);
+                updateReminderById(reminderId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void updateReminderById(long reminderId) {
+        new Thread(() -> {
+            List<Reminder> allReminders = reminderDao.getActiveTimeReminders();
+            Reminder reminderToUpdate = null;
+            for (Reminder r : allReminders) {
+                if (r.id == reminderId) {
+                    reminderToUpdate = r;
+                    break;
+                }
+            }
+
+            if (reminderToUpdate == null) {
+                runOnUiThread(() -> {
+                    appendOutput("НАПОМИНАНИЕ С ID " + reminderId + " НЕ НАЙДЕНО ИЛИ УЖЕ ВЫПОЛНЕНО\n");
+                    Toast.makeText(this, "Напоминание не найдено", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            final Reminder finalReminderToUpdate = reminderToUpdate;
+            reminderToUpdate.isTriggered = true;
+            reminderDao.update(reminderToUpdate);
 
             runOnUiThread(() -> {
                 appendOutput("НАПОМИНАНИЕ ОТМЕЧЕНО КАК ВЫПОЛНЕННОЕ");
-                appendOutput("   ID: " + reminder.id);
-                appendOutput("   Тип: " + reminder.type);
-                appendOutput("   isTriggered = " + reminder.isTriggered);
+                appendOutput(" ID: " + finalReminderToUpdate.id);
+                appendOutput(" Тип: " + finalReminderToUpdate.type);
                 appendOutput("");
+                Toast.makeText(this, "Напоминание отмечено", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
 
-    private void deleteReminder() {
+    private void showDeleteReminderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Удаление напоминания");
+        builder.setMessage("Введите ID напоминания для удаления:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID напоминания");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Удалить", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID напоминания", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                long reminderId = Long.parseLong(idStr);
+                deleteReminderById(reminderId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void deleteReminderById(long reminderId) {
         new Thread(() -> {
-            List<Task> tasks = taskDao.getAllTasks();
-            if (tasks.isEmpty()) {
-                runOnUiThread(() -> appendOutput(" НЕТ ЗАДАЧ\n"));
+            List<Reminder> allReminders = reminderDao.getActiveTimeReminders();
+            allReminders.addAll(reminderDao.getActiveLocationReminders());
+
+            Reminder reminderToDelete = null;
+            for (Reminder r : allReminders) {
+                if (r.id == reminderId) {
+                    reminderToDelete = r;
+                    break;
+                }
+            }
+
+            if (reminderToDelete == null) {
+                runOnUiThread(() -> {
+                    appendOutput("НАПОМИНАНИЕ С ID " + reminderId + " НЕ НАЙДЕНО\n");
+                    Toast.makeText(this, "Напоминание не найдено", Toast.LENGTH_SHORT).show();
+                });
                 return;
             }
 
-            List<Reminder> reminders = reminderDao.getRemindersForTask(tasks.get(0).id);
-            if (reminders.isEmpty()) {
-                runOnUiThread(() -> appendOutput(" НЕТ НАПОМИНАНИЙ ДЛЯ УДАЛЕНИЯ\n"));
-                return;
-            }
-
-            Reminder reminder = reminders.get(0);
-            reminderDao.delete(reminder);
+            final Reminder finalReminderToDelete = reminderToDelete;
+            reminderDao.delete(reminderToDelete);
 
             runOnUiThread(() -> {
-                appendOutput(" НАПОМИНАНИЕ УДАЛЕНО");
-                appendOutput("   ID: " + reminder.id);
+                appendOutput("НАПОМИНАНИЕ УДАЛЕНО");
+                appendOutput(" ID: " + finalReminderToDelete.id);
                 appendOutput("");
+                Toast.makeText(this, "Напоминание удалено", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
@@ -436,12 +1205,12 @@ public class TestActivity extends AppCompatActivity {
         new Thread(() -> {
             List<Reminder> reminders = reminderDao.getActiveTimeReminders();
             runOnUiThread(() -> {
-                appendOutput(" АКТИВНЫЕ TIME-НАПОМИНАНИЯ (" + reminders.size() + " шт.)");
+                appendOutput("АКТИВНЫЕ TIME-НАПОМИНАНИЯ (" + reminders.size() + " шт.)");
                 if (reminders.isEmpty()) {
                     appendOutput("   Нет активных напоминаний");
                 } else {
                     for (Reminder r : reminders) {
-                        appendOutput("   • ID:" + r.id + " | Задача ID:" + r.taskId);
+                        appendOutput("   ID:" + r.id + " | Задача ID:" + r.taskId);
                         appendOutput("     Сработает: " + sdf.format(new Date(r.triggerTime)));
                     }
                 }
@@ -452,26 +1221,14 @@ public class TestActivity extends AppCompatActivity {
 
     private void getActiveLocationReminders() {
         new Thread(() -> {
-            List<Task> tasks = taskDao.getAllTasks();
-            if (!tasks.isEmpty()) {
-                Reminder locationReminder = new Reminder();
-                locationReminder.taskId = tasks.get(0).id;
-                locationReminder.type = "LOCATION";
-                locationReminder.lat = 55.7558;
-                locationReminder.lng = 37.6176;
-                locationReminder.radius = 500.0f;
-                locationReminder.isTriggered = false;
-                reminderDao.insert(locationReminder);
-            }
-
             List<Reminder> reminders = reminderDao.getActiveLocationReminders();
             runOnUiThread(() -> {
-                appendOutput(" АКТИВНЫЕ LOCATION-НАПОМИНАНИЯ (" + reminders.size() + " шт.)");
+                appendOutput("АКТИВНЫЕ LOCATION-НАПОМИНАНИЯ (" + reminders.size() + " шт.)");
                 if (reminders.isEmpty()) {
                     appendOutput("   Нет активных location-напоминаний");
                 } else {
                     for (Reminder r : reminders) {
-                        appendOutput("   • ID:" + r.id + " | Задача ID:" + r.taskId);
+                        appendOutput("   ID:" + r.id + " | Задача ID:" + r.taskId);
                         appendOutput("     Координаты: (" + r.lat + ", " + r.lng + ")");
                         appendOutput("     Радиус: " + r.radius + " метров");
                     }
@@ -481,23 +1238,55 @@ public class TestActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void deleteAllRemindersForTask() {
-        new Thread(() -> {
-            List<Task> tasks = taskDao.getAllTasks();
-            if (tasks.isEmpty()) {
-                runOnUiThread(() -> appendOutput(" НЕТ ЗАДАЧ\n"));
+    private void showDeleteAllRemindersForTaskDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Удаление напоминаний задачи");
+        builder.setMessage("Введите ID задачи для удаления всех напоминаний:");
+
+        final EditText input = new EditText(this);
+        input.setHint("ID задачи");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("Удалить", (dialog, which) -> {
+            String idStr = input.getText().toString().trim();
+            if (idStr.isEmpty()) {
+                Toast.makeText(this, "Введите ID задачи", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Task task = tasks.get(0);
-            int count = reminderDao.getCountForTask(task.id);
-            reminderDao.deleteByTaskId(task.id);
+            try {
+                long taskId = Long.parseLong(idStr);
+                deleteAllRemindersForTask(taskId);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Введите корректный ID", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void deleteAllRemindersForTask(long taskId) {
+        new Thread(() -> {
+            Task task = taskDao.getTask(taskId);
+            if (task == null) {
+                runOnUiThread(() -> {
+                    appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
+                    Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            int count = reminderDao.getCountForTask(taskId);
+            reminderDao.deleteByTaskId(taskId);
 
             runOnUiThread(() -> {
-                appendOutput(" УДАЛЕНЫ ВСЕ НАПОМИНАНИЯ ЗАДАЧИ");
+                appendOutput("УДАЛЕНЫ ВСЕ НАПОМИНАНИЯ ЗАДАЧИ");
                 appendOutput("   Задача: " + task.title + " (ID: " + task.id + ")");
                 appendOutput("   Удалено напоминаний: " + count);
                 appendOutput("");
+                Toast.makeText(this, "Напоминания удалены", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
@@ -514,7 +1303,7 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void clearOutput() {
-        tvOutput.setText("=== НАЧАЛО НОВОГО ТЕСТИРОВАНИЯ ===\n\n");
+        tvOutput.setText("...\n\n");
         Toast.makeText(this, "Вывод очищен", Toast.LENGTH_SHORT).show();
     }
 }
