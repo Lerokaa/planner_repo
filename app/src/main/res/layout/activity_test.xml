@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Планнер - Тестирование функций"
+        android:text="Тестирование функций"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -31,7 +31,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="=== ЗАМЕТКИ (NOTES) ==="
+                android:text="Заметочки"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:background="#E3F2FD"
@@ -49,14 +49,14 @@
                 android:id="@+id/btn_update_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2. Обновить первую заметку"
+                android:text="2. Обновить заметку"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_delete_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="3. Удалить первую заметку"
+                android:text="3. Удалить заметку"
                 android:layout_marginTop="4dp" />
 
             <Button
@@ -77,7 +77,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="=== ЗАДАЧИ (TASKS) ==="
+                android:text="Задачки"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:background="#E8F5E9"
@@ -88,35 +88,42 @@
                 android:id="@+id/btn_create_task"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="6. Создать задачу"
+                android:text="1. Создать задачу"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btn_complete_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2. Отметить задачу как выполненную"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_update_task"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="7. Обновить первую задачу"
+                android:text="3. Обновить задачу"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_delete_task"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="8. Удалить первую задачу"
+                android:text="4. Удалить задачу"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_get_all_tasks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="9. Показать все задачи"
+                android:text="5. Показать все задачи"
                 android:layout_marginTop="4dp" />
 
             <!-- REMINDER FUNCTIONS -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="=== НАПОМИНАНИЯ (REMINDERS) ==="
+                android:text="Напоминашки"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:background="#FFF3E0"
@@ -127,56 +134,56 @@
                 android:id="@+id/btn_create_reminder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="10. Создать напоминание для первой задачи"
+                android:text="1. Создать напоминание для задачи"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_get_reminders_for_task"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="11. Показать напоминания первой задачи"
+                android:text="2. Показать напоминания задачи"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_update_reminder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="12. Отметить первое напоминание как выполненное"
+                android:text="3. Отметить напоминание как выполненное"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_delete_reminder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="13. Удалить первое напоминание"
+                android:text="4. Удалить напоминание"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_get_active_time_reminders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="14. Показать активные TIME напоминания"
+                android:text="5. Показать активные TIME напоминания"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_get_active_location_reminders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="15. Показать активные LOCATION напоминания"
+                android:text="6. Показать активные LOCATION напоминания"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_delete_all_reminders_for_task"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="16. Удалить все напоминания первой задачи"
+                android:text="7. Удалить все напоминания задачи"
                 android:layout_marginTop="4dp" />
 
             <Button
                 android:id="@+id/btn_clear_output"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ОЧИСТИТЬ ВЫВОД"
+                android:text="Очистить вывод"
                 android:layout_marginTop="16dp"
                 android:background="#F44336"
                 android:textColor="@android:color/white"
@@ -188,7 +195,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="РЕЗУЛЬТАТ ВЫПОЛНЕНИЯ:"
+        android:text="Результат:"
         android:textStyle="bold"
         android:background="#9E9E9E"
         android:padding="4dp"
@@ -206,7 +213,7 @@
             android:padding="8dp"
             android:textSize="11sp"
             android:fontFamily="monospace"
-            android:text="Готов к тестированию..." />
+            android:text="..." />
     </ScrollView>
 
 </LinearLayout>

@@ -25,4 +25,7 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE id = :id")
     Task getTask(long id);
+
+    @Query("UPDATE tasks SET isCompleted = :isCompleted WHERE id = :taskId")
+    void updateTaskCompletion(long taskId, boolean isCompleted);
 }
