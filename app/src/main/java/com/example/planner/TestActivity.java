@@ -492,17 +492,24 @@ public class TestActivity extends AppCompatActivity {
             if (hasDate && hasTime) {
                 selectedDateTime = calendar.getTimeInMillis();
             } else if (hasDate && !hasTime) {
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                selectedDateTime = calendar.getTimeInMillis();
+                // Только дата - ставим время в 00:00
+                Calendar tempCal = Calendar.getInstance();
+                tempCal.setTimeInMillis(calendar.getTimeInMillis());
+                tempCal.set(Calendar.HOUR_OF_DAY, 0);
+                tempCal.set(Calendar.MINUTE, 0);
+                tempCal.set(Calendar.SECOND, 0);
+                tempCal.set(Calendar.MILLISECOND, 0);
+                selectedDateTime = tempCal.getTimeInMillis();
             } else if (!hasDate && hasTime) {
+                // Только время - ставим дату на сегодня
                 Calendar tempCal = Calendar.getInstance();
                 tempCal.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
                 tempCal.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
                 tempCal.set(Calendar.SECOND, 0);
+                tempCal.set(Calendar.MILLISECOND, 0);
                 selectedDateTime = tempCal.getTimeInMillis();
             }
+            // Если hasDate == false && hasTime == false, то selectedDateTime остается null
 
             createTask(title, content, selectedDateTime);
         });
@@ -518,9 +525,23 @@ public class TestActivity extends AppCompatActivity {
             task.content = content;
             task.isCompleted = false;
 
+            // Только если пользователь явно выбрал дату и время
             if (dateTime != null) {
-                task.date = dateTime;
-                task.time = dateTime;
+                // Разделяем dateTime на date и time
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.setTimeInMillis(dateTime);
+
+                // Для date - устанавливаем начало дня
+                java.util.Calendar dateCal = java.util.Calendar.getInstance();
+                dateCal.set(cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH), 0, 0, 0);
+                dateCal.set(java.util.Calendar.MILLISECOND, 0);
+                task.date = dateCal.getTimeInMillis();
+
+                // Для time - сохраняем время от начала дня
+                java.util.Calendar timeCal = java.util.Calendar.getInstance();
+                timeCal.set(1970, 0, 1, cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0);
+                timeCal.set(java.util.Calendar.MILLISECOND, 0);
+                task.time = timeCal.getTimeInMillis();
             } else {
                 task.date = null;
                 task.time = null;
@@ -533,8 +554,8 @@ public class TestActivity extends AppCompatActivity {
                 appendOutput("   Название: " + task.title);
                 appendOutput("   Описание: " + task.content);
                 if (dateTime != null) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
-                    appendOutput("   Дата и время: " + sdf.format(new Date(dateTime)));
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault());
+                    appendOutput("   Дата и время: " + sdf.format(new java.util.Date(dateTime)));
                 } else {
                     appendOutput("   Дата и время: не установлены");
                 }
@@ -783,7 +804,30 @@ public class TestActivity extends AppCompatActivity {
                     for (Task task : tasks) {
                         appendOutput("   ID:" + task.id + " | " + task.title);
                         appendOutput("     Статус: " + (task.isCompleted ? "Выполнена" : "Не выполнена"));
-                        appendOutput("     Описание: " + (task.content.length() > 50 ? task.content.substring(0, 50) + "..." : task.content));
+
+                        // Показываем дату и время
+                        if (task.date != null && task.date != 0 && task.time != null && task.time != 0) {
+                            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault());
+                            // Для отображения нужно объединить дату и время
+                            java.util.Calendar dateCal = java.util.Calendar.getInstance();
+                            dateCal.setTimeInMillis(task.date);
+                            java.util.Calendar timeCal = java.util.Calendar.getInstance();
+                            timeCal.setTimeInMillis(task.time);
+                            dateCal.set(java.util.Calendar.HOUR_OF_DAY, timeCal.get(java.util.Calendar.HOUR_OF_DAY));
+                            dateCal.set(java.util.Calendar.MINUTE, timeCal.get(java.util.Calendar.MINUTE));
+                            appendOutput("     Дата/время: " + sdf.format(new java.util.Date(dateCal.getTimeInMillis())));
+                        } else if (task.date != null && task.date != 0) {
+                            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault());
+                            appendOutput("     Дата: " + sdf.format(new java.util.Date(task.date)));
+                        } else if (task.time != null && task.time != 0) {
+                            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
+                            appendOutput("     Время: " + sdf.format(new java.util.Date(task.time)));
+                        } else {
+                            appendOutput("     Дата/время: не указано");
+                        }
+
+                        String description = task.content != null ? task.content : "";
+                        appendOutput("     Описание: " + (description.length() > 50 ? description.substring(0, 50) + "..." : description));
                     }
                 }
                 appendOutput("");
@@ -837,10 +881,10 @@ public class TestActivity extends AppCompatActivity {
     private void showTimeReminderDialog(long taskId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Временное напоминание");
-        builder.setMessage("Введите задержку в минутах:");
+        builder.setMessage("Введите за сколько минут до задачи сработает напоминание:");
 
         final EditText input = new EditText(this);
-        input.setHint("Минуты");
+        input.setHint("Минуты до задачи (например, 15)");
         input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         builder.setView(input);
 
@@ -863,13 +907,30 @@ public class TestActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void createTimeReminder(long taskId, int minutes) {
+    private void createTimeReminder(long taskId, int minutesBefore) {
         new Thread(() -> {
             Task task = taskDao.getTask(taskId);
             if (task == null) {
                 runOnUiThread(() -> {
                     appendOutput("ЗАДАЧА С ID " + taskId + " НЕ НАЙДЕНА\n");
                     Toast.makeText(this, "Задача не найдена", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            // Проверяем, есть ли у задачи дата и время
+            if (task.date == null || task.date == 0) {
+                runOnUiThread(() -> {
+                    appendOutput("ОШИБКА! У задачи нет даты выполнения");
+                    Toast.makeText(this, "У задачи нет даты", Toast.LENGTH_SHORT).show();
+                });
+                return;
+            }
+
+            if (task.time == null || task.time == 0) {
+                runOnUiThread(() -> {
+                    appendOutput("ОШИБКА! У задачи нет времени выполнения");
+                    Toast.makeText(this, "У задачи нет времени", Toast.LENGTH_SHORT).show();
                 });
                 return;
             }
@@ -883,10 +944,28 @@ public class TestActivity extends AppCompatActivity {
                 return;
             }
 
+            // Объединяем дату и время в одну метку времени
+            long dueDateTime = combineDateAndTime(task.date, task.time);
+
+            // Время срабатывания = время выполнения задачи - задержка (в миллисекундах)
+            long triggerTime = dueDateTime - (minutesBefore * 60 * 1000);
+
+            // Проверяем, не прошедшее ли время
+            if (triggerTime <= System.currentTimeMillis()) {
+                runOnUiThread(() -> {
+                    appendOutput("ПРЕДУПРЕЖДЕНИЕ! Время напоминания уже прошло");
+                    appendOutput("   Задача на: " + formatDateTime(dueDateTime));
+                    appendOutput("   Напоминание за " + minutesBefore + " мин. должно было сработать в: " + formatDateTime(triggerTime));
+                    appendOutput("");
+                    Toast.makeText(this, "Время напоминания уже прошло", Toast.LENGTH_LONG).show();
+                });
+                return;
+            }
+
             Reminder reminder = new Reminder();
             reminder.taskId = taskId;
             reminder.type = "TIME";
-            reminder.triggerTime = System.currentTimeMillis() + (minutes * 60 * 1000);
+            reminder.triggerTime = triggerTime;
             reminder.isTriggered = false;
 
             long id = reminderDao.insert(reminder);
@@ -895,12 +974,38 @@ public class TestActivity extends AppCompatActivity {
                 appendOutput("СОЗДАНО НАПОМИНАНИЕ");
                 appendOutput("   Для задачи ID: " + taskId + " (" + task.title + ")");
                 appendOutput("   Тип: TIME");
-                appendOutput("   Сработает через: " + minutes + " мин.");
+                appendOutput("   Задача назначена на: " + formatDateTime(dueDateTime));
+                appendOutput("   Напоминание за " + minutesBefore + " мин. сработает в: " + formatDateTime(triggerTime));
                 appendOutput("   Напоминаний у задачи: " + (count + 1) + "/5");
                 appendOutput("");
                 Toast.makeText(this, "Напоминание создано", Toast.LENGTH_SHORT).show();
             });
         }).start();
+    }
+
+    // Вспомогательный метод для объединения даты и времени
+    private long combineDateAndTime(long dateMillis, long timeMillis) {
+        // Получаем календарь из даты
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.setTimeInMillis(dateMillis);
+
+        // Получаем часы и минуты из времени
+        java.util.Calendar timeCalendar = java.util.Calendar.getInstance();
+        timeCalendar.setTimeInMillis(timeMillis);
+
+        // Устанавливаем часы и минуты в основную дату
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, timeCalendar.get(java.util.Calendar.HOUR_OF_DAY));
+        calendar.set(java.util.Calendar.MINUTE, timeCalendar.get(java.util.Calendar.MINUTE));
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    // Вспомогательный метод для форматирования даты+времени (для вывода в лог)
+    private String formatDateTime(long millis) {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date(millis));
     }
 
     private void showLocationReminderDialog(long taskId) {
