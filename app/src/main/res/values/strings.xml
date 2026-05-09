@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">planner</string>
+    <!-- Onboarding strings -->
+    <string name="onboarding_title_1">Управление задачами</string>
+    <string name="onboarding_title_2">Календарь событий</string>
+    <string name="onboarding_title_3">Привычки и цели</string>
+
+    <string name="onboarding_subtitle_1">Организуйте свои задачи</string>
+    <string name="onboarding_subtitle_2">Планируйте время</string>
+    <string name="onboarding_subtitle_3">Развивайте себя</string>
+
+    <string name="onboarding_desc_1">Превратите хаос идей в четкий план действий с напоминаниями и приоритетами</string>
+    <string name="onboarding_desc_2">Все ваши события и встречи в одном месте с удобным календарем</string>
+    <string name="onboarding_desc_3">Отслеживайте прогресс и формируйте полезные привычки каждый день</string>
 </resources>
