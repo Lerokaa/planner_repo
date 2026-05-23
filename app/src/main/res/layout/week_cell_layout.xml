@@ -6,17 +6,17 @@
     android:layout_weight="1"
     android:orientation="vertical"
     android:background="@drawable/week_day_background"
-    android:minHeight="120dp"
-    android:padding="8dp"
-    android:layout_margin="3dp">
+    android:minHeight="@dimen/calendar_cell_min_height"
+    android:padding="@dimen/padding_small"
+    android:layout_margin="@dimen/padding_small">
 
     <TextView
         android:id="@+id/tvDayNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_large"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="@dimen/padding_small" />
 
     <LinearLayout
         android:id="@+id/tasksContainer"

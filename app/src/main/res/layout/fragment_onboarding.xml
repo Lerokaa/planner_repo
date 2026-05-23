@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="24dp"
     android:background="#FFFFFF"
@@ -80,7 +81,8 @@
             android:textColor="#4B5C78"
             android:backgroundTint="#ADB9CC"
             android:elevation="4dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:cornerRadius="16dp"/>
 
         <Button
             android:id="@+id/btnNext"
@@ -92,7 +94,8 @@
             android:textSize="16sp"
             android:textColor="#FFFFFF"
             android:backgroundTint="#4B5C78"
-            android:elevation="4dp" />
+            android:elevation="4dp"
+            app:cornerRadius="16dp"/>
     </LinearLayout>
 
     <TextView

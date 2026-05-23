@@ -20,7 +20,7 @@
             android:paddingStart="20dp"
             android:paddingTop="24dp"
             android:paddingEnd="20dp"
-            android:paddingBottom="8dp"
+            android:paddingBottom="16dp"
             android:gravity="center_vertical">
 
             <TextView
@@ -28,9 +28,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Февраль"
+                android:text="Май"
                 android:textColor="#1F2532"
-                android:textSize="22sp"
+                android:textSize="28sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
 
@@ -99,11 +99,15 @@
 
         <!-- Календарь по часам -->
         <ScrollView
+            android:id="@+id/hourScrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:fillViewport="true"
-            android:scrollbars="vertical">
+            android:scrollbars="vertical"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp">
 
             <LinearLayout
                 android:id="@+id/hourlySchedule"
@@ -111,7 +115,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp" />
+                android:paddingEnd="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"/>
 
         </ScrollView>
 
@@ -126,6 +132,7 @@
             app:itemTextColor="#1F2532"
             app:itemTextAppearanceActive="@style/BottomNavText"
             app:itemTextAppearanceInactive="@style/BottomNavText" />
+
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -134,14 +141,10 @@
         android:layout_height="56dp"
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="96dp"
+        android:layout_marginBottom="120dp"
         android:backgroundTint="#4B5C78"
-        android:scaleType="center"
         app:tint="#CCD2DE"
-        app:srcCompat="@drawable/ic_add"
-        app:fabSize="normal"
-        app:elevation="6dp"
-        app:shapeAppearanceOverlay="@style/CircularFloatingActionButton" />
+        app:srcCompat="@drawable/ic_add" />
 
     <View
         android:id="@+id/dimOverlay"

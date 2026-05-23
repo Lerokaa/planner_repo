@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#F2F2F7"
+    android:paddingTop="@dimen/padding_large"
+    android:paddingBottom="@dimen/padding_small"
+    android:paddingStart="@dimen/padding_large">
+
+    <TextView
+        android:id="@+id/tvSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Сегодня"
+        android:textSize="@dimen/text_medium"
+        android:textStyle="bold"
+        android:textColor="#8E8E93" />
+
+</LinearLayout>
