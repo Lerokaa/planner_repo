@@ -7,20 +7,185 @@
     android:layout_height="match_parent"
     android:background="#F8F9FA">
 
-    <!-- Вертикальный контейнер для фрагмента и меню -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Сюда вставится TasksFragment -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical">
 
-        <!-- Нижнее меню -->
-        <FrameLayout
-            android:id="@+id/fragment_container"
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ваши задачи"
+                android:textColor="#1F2532"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/search_background"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="#8E8E93" />
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:hint="Поиск..."
+                    android:background="@null"
+                    android:textSize="14sp"
+                    android:textColor="#1F2532"
+                    android:textColorHint="#8E8E93" />
+
+                <ImageView
+                    android:id="@+id/btnClearSearch"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone"
+                    app:tint="#8E8E93" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <LinearLayout
+                android:id="@+id/filterChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/chipAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Все"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/chip_selected"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/chipToday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Сегодня"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/chip_unselected"
+                    android:textColor="#4B5C78" />
+
+                <TextView
+                    android:id="@+id/chipTomorrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Завтра"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/chip_unselected"
+                    android:textColor="#4B5C78" />
+
+                <TextView
+                    android:id="@+id/chipWeek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Эта неделя"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/chip_unselected"
+                    android:textColor="#4B5C78" />
+
+                <TextView
+                    android:id="@+id/chipCompleted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Выполненные"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:background="@drawable/chip_unselected"
+                    android:textColor="#4B5C78" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/tvSectionHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Все задачи"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#4B5C78"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
+
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp">
+
+            <LinearLayout
+                android:id="@+id/tasksContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dp" />
+
+        </ScrollView>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
@@ -33,9 +198,9 @@
             app:itemTextColor="#1F2532"
             app:itemTextAppearanceActive="@style/BottomNavText"
             app:itemTextAppearanceInactive="@style/BottomNavText" />
+
     </LinearLayout>
 
-    <!-- Кнопка "+" -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="56dp"
@@ -44,14 +209,9 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="80dp"
         android:backgroundTint="#4B5C78"
-        android:scaleType="center"
         app:tint="#CCD2DE"
-        app:srcCompat="@drawable/ic_add"
-        app:fabSize="normal"
-        app:elevation="6dp"
-        app:shapeAppearanceOverlay="@style/CircularFloatingActionButton" />
+        app:srcCompat="@drawable/ic_add" />
 
-    <!-- Затемнение -->
     <View
         android:id="@+id/dimOverlay"
         android:layout_width="match_parent"
@@ -59,7 +219,6 @@
         android:background="#80000000"
         android:visibility="gone" />
 
-    <!-- Модалка -->
     <LinearLayout
         android:id="@+id/modalPopup"
         android:layout_width="wrap_content"
@@ -72,8 +231,45 @@
         android:elevation="8dp"
         android:padding="12dp"
         android:visibility="gone">
-        <TextView android:id="@+id/btnAddTask" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="8dp" android:text="Добавить задачу" android:textColor="#1F2532" android:textSize="15sp" />
-        <TextView android:id="@+id/btnAddNote" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="8dp" android:text="Добавить заметку" android:textColor="#1F2532" android:textSize="15sp" />
-        <TextView android:id="@+id/btnAddHabit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="8dp" android:text="Добавить привычку" android:textColor="#1F2532" android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/btnAddTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Добавить задачу"
+            android:textColor="#1F2532"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif" />
+
+        <TextView
+            android:id="@+id/btnAddNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Добавить заметку"
+            android:textColor="#1F2532"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif" />
+
+        <TextView
+            android:id="@+id/btnAddHabit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Добавить привычку"
+            android:textColor="#1F2532"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif" />
     </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

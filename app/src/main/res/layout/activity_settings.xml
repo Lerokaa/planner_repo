@@ -17,10 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingTop="24dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="16dp"
+            android:paddingStart="@dimen/padding_xlarge"
+            android:paddingTop="@dimen/padding_xxlarge"
+            android:paddingEnd="@dimen/padding_xlarge"
+            android:paddingBottom="@dimen/padding_large"
             android:gravity="center_vertical">
 
             <TextView
@@ -29,7 +29,7 @@
                 android:layout_weight="1"
                 android:text="Профиль"
                 android:textColor="#1F2532"
-                android:textSize="28sp"
+                android:textSize="@dimen/text_xxlarge"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
 
@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="20dp"
+                android:paddingHorizontal="@dimen/padding_xlarge"
                 android:paddingBottom="80dp">
 
                 <!-- Фотография профиля -->
@@ -57,16 +57,17 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginTop="@dimen/padding_large"
+                    android:layout_marginBottom="@dimen/padding_xxlarge"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="?attr/selectableItemBackground">
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="@dimen/padding_small">
 
                     <ImageView
                         android:id="@+id/profileImage"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="@dimen/avatar_size_large"
+                        android:layout_height="@dimen/avatar_size_large"
                         android:src="@drawable/ic_default_avatar"
                         android:scaleType="centerCrop" />
 
@@ -75,8 +76,8 @@
                         android:layout_height="wrap_content"
                         android:text="Изменить фото"
                         android:textColor="#4B5C78"
-                        android:textSize="14sp"
-                        android:layout_marginTop="8dp" />
+                        android:textSize="@dimen/text_medium"
+                        android:layout_marginTop="@dimen/padding_small" />
 
                 </LinearLayout>
 
@@ -86,25 +87,25 @@
                     android:layout_height="wrap_content"
                     android:text="Базовая информация"
                     android:textColor="#4B5C78"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/text_medium"
                     android:textStyle="bold"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginTop="@dimen/padding_large"
+                    android:layout_marginBottom="@dimen/padding_normal" />
 
                 <!-- Поле Имя -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingVertical="12dp">
+                    android:paddingVertical="@dimen/padding_normal">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Имя"
                         android:textColor="#1F2532"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="@dimen/text_normal"
+                        android:layout_marginBottom="@dimen/padding_small" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -119,7 +120,7 @@
                             android:layout_weight="1"
                             android:text="Елена"
                             android:textColor="#8E8E93"
-                            android:textSize="16sp" />
+                            android:textSize="@dimen/text_normal" />
 
                         <EditText
                             android:id="@+id/etName"
@@ -128,24 +129,24 @@
                             android:layout_weight="1"
                             android:text="Елена"
                             android:textColor="#1F2532"
-                            android:textSize="16sp"
+                            android:textSize="@dimen/text_normal"
                             android:background="@drawable/edit_text_background"
-                            android:padding="12dp"
+                            android:padding="@dimen/padding_normal"
                             android:visibility="gone" />
 
                         <ImageView
                             android:id="@+id/btnEditName"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_edit"
                             android:contentDescription="Редактировать" />
 
                         <ImageView
                             android:id="@+id/btnSaveName"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_save"
                             android:contentDescription="Сохранить"
                             android:visibility="gone" />
@@ -164,15 +165,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingVertical="12dp">
+                    android:paddingVertical="@dimen/padding_normal">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Фамилия"
                         android:textColor="#1F2532"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="@dimen/text_normal"
+                        android:layout_marginBottom="@dimen/padding_small" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -187,7 +188,7 @@
                             android:layout_weight="1"
                             android:text="Смирнова"
                             android:textColor="#8E8E93"
-                            android:textSize="16sp" />
+                            android:textSize="@dimen/text_normal" />
 
                         <EditText
                             android:id="@+id/etSurname"
@@ -196,24 +197,24 @@
                             android:layout_weight="1"
                             android:text="Смирнова"
                             android:textColor="#1F2532"
-                            android:textSize="16sp"
+                            android:textSize="@dimen/text_normal"
                             android:background="@drawable/edit_text_background"
-                            android:padding="12dp"
+                            android:padding="@dimen/padding_normal"
                             android:visibility="gone" />
 
                         <ImageView
                             android:id="@+id/btnEditSurname"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_edit"
                             android:contentDescription="Редактировать" />
 
                         <ImageView
                             android:id="@+id/btnSaveSurname"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_save"
                             android:contentDescription="Сохранить"
                             android:visibility="gone" />
@@ -232,15 +233,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingVertical="12dp">
+                    android:paddingVertical="@dimen/padding_normal">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Почта"
                         android:textColor="#1F2532"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="@dimen/text_normal"
+                        android:layout_marginBottom="@dimen/padding_small" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -255,7 +256,7 @@
                             android:layout_weight="1"
                             android:text="smirnovael@gmail.com"
                             android:textColor="#8E8E93"
-                            android:textSize="16sp" />
+                            android:textSize="@dimen/text_normal" />
 
                         <EditText
                             android:id="@+id/etEmail"
@@ -264,24 +265,25 @@
                             android:layout_weight="1"
                             android:text="smirnovael@gmail.com"
                             android:textColor="#1F2532"
-                            android:textSize="16sp"
+                            android:textSize="@dimen/text_normal"
                             android:background="@drawable/edit_text_background"
-                            android:padding="12dp"
+                            android:padding="@dimen/padding_normal"
                             android:visibility="gone" />
 
                         <ImageView
                             android:id="@+id/btnEditEmail"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_edit"
-                            android:contentDescription="Редактировать" />
+                            android:contentDescription="Редактировать"
+                            android:visibility="gone" />
 
                         <ImageView
                             android:id="@+id/btnSaveEmail"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_save"
                             android:contentDescription="Сохранить"
                             android:visibility="gone" />
@@ -300,15 +302,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingVertical="12dp">
+                    android:paddingVertical="@dimen/padding_normal">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Обо мне"
                         android:textColor="#1F2532"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="@dimen/text_normal"
+                        android:layout_marginBottom="@dimen/padding_small" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -323,7 +325,7 @@
                             android:layout_weight="1"
                             android:text="Люблю планировать свои дела и ставить цели"
                             android:textColor="#8E8E93"
-                            android:textSize="16sp"
+                            android:textSize="@dimen/text_normal"
                             android:maxLines="2"
                             android:ellipsize="end" />
 
@@ -334,25 +336,25 @@
                             android:layout_weight="1"
                             android:text="Люблю планировать свои дела и ставить цели"
                             android:textColor="#1F2532"
-                            android:textSize="16sp"
+                            android:textSize="@dimen/text_normal"
                             android:background="@drawable/edit_text_background"
-                            android:padding="12dp"
+                            android:padding="@dimen/padding_normal"
                             android:visibility="gone"
                             android:maxLines="3" />
 
                         <ImageView
                             android:id="@+id/btnEditAbout"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_edit"
                             android:contentDescription="Редактировать" />
 
                         <ImageView
                             android:id="@+id/btnSaveAbout"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="12dp"
+                            android:layout_width="@dimen/icon_large"
+                            android:layout_height="@dimen/icon_large"
+                            android:layout_marginStart="@dimen/padding_normal"
                             android:src="@drawable/ic_save"
                             android:contentDescription="Сохранить"
                             android:visibility="gone" />
@@ -368,13 +370,13 @@
 
                 <!-- Раздел: Уведомления -->
                 <TextView
-                    android:layout_width="375dp"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="32dp"
-                    android:layout_marginBottom="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/padding_xxlarge"
+                    android:layout_marginBottom="@dimen/padding_normal"
                     android:text="Уведомления"
                     android:textColor="#4B5C78"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/text_medium"
                     android:textStyle="bold" />
 
                 <!-- Пункт Уведомления -->
@@ -383,7 +385,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingVertical="16dp"
+                    android:paddingVertical="@dimen/padding_large"
                     android:gravity="center_vertical"
                     android:clickable="true"
                     android:focusable="true"
@@ -395,64 +397,11 @@
                         android:layout_weight="1"
                         android:text="Уведомления"
                         android:textColor="#1F2532"
-                        android:textSize="16sp" />
+                        android:textSize="@dimen/text_normal" />
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_arrow_right"
-                        android:contentDescription="Перейти" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E0E0" />
-
-                <!-- Раздел: Оформление -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Оформление"
-                    android:textColor="#4B5C78"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="32dp"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Пункт Тема -->
-                <LinearLayout
-                    android:id="@+id/layoutTheme"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingVertical="16dp"
-                    android:gravity="center_vertical"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?attr/selectableItemBackground">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Тема"
-                        android:textColor="#1F2532"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/tvThemeValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Светлая"
-                        android:textColor="#8E8E93"
-                        android:textSize="16sp"
-                        android:layout_marginEnd="12dp" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="@dimen/icon_normal"
+                        android:layout_height="@dimen/icon_normal"
                         android:src="@drawable/ic_arrow_right"
                         android:contentDescription="Перейти" />
 
@@ -464,9 +413,9 @@
                     android:background="#E0E0E0" />
 
             </LinearLayout>
+
         </ScrollView>
 
-        <!-- Нижний навигационный бар -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"

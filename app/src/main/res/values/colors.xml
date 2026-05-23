@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="white">#FFFFFF</color>
-    <color name="text_primary">#1F2532</color>
-    <color name="text_time">#8E8E93</color>
-    <color name="fab_background">#4B5C78</color>
-    <color name="fab_icon">#CCD2DE</color>
-    <color name="icon_tint">#1F2532</color>
-    <color name="divider">#E0E0E0</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
 
     <!-- Пастельные цвета для задач -->
-    <color name="task_blue_light">#D6E8FF</color>
-    <color name="task_pink_light">#FFD6D6</color>
-    <color name="task_green_light">#D6F5D6</color>
-    <color name="task_yellow_light">#FFF3D6</color>
-    <color name="task_purple_light">#E8D6FF</color>
+    <color name="task_pastel_blue">#B8E1FF</color>
+    <color name="task_pastel_green">#C5E8B4</color>
+    <color name="task_pastel_yellow">#FFF2B5</color>
+    <color name="task_pastel_peach">#FFD4B5</color>
+    <color name="task_pastel_lavender">#E0C5FF</color>
+    <color name="task_pastel_mint">#B4E8D4</color>
+    <color name="task_pastel_coral">#FFC5B4</color>
+    <color name="task_pastel_sage">#C5E0B4</color>
 
-    <color name="dark_text">#1F2532</color>
-    <color name="light_text">#4B5C78</color>
     <color name="gray">#8E8E93</color>
+    <color name="light_text">#6B7280</color>
+    <color name="dark_text">#1F2532</color>
     <color name="red">#FF3B30</color>
 
     <color name="color_next_button">#4B5C78</color>
     <color name="color_start_button">#1F2532</color>
+
 </resources>

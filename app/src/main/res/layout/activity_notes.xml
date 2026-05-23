@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F7">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/padding_normal"
+            android:paddingBottom="@dimen/padding_small"
+            android:background="#F2F2F7">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Заметки"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold"
+                android:textColor="#1C1C1E"
+                android:paddingStart="@dimen/padding_large"
+                android:paddingEnd="@dimen/padding_large" />
+
+            <TextView
+                android:id="@+id/tvNotesCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0 заметок"
+                android:textSize="@dimen/text_medium"
+                android:textColor="#8E8E93"
+                android:paddingStart="@dimen/padding_large"
+                android:paddingEnd="@dimen/padding_large"
+                android:layout_marginTop="@dimen/padding_small" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:id="@+id/notesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </ScrollView>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/bottom_nav_menu"
+            app:itemIconTint="#1F2532"
+            app:itemTextColor="#1F2532" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAdd"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="80dp"
+        android:backgroundTint="#4B5C78"
+        app:tint="#CCD2DE"
+        app:srcCompat="@drawable/ic_add" />
+
+    <View
+        android:id="@+id/dimOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/modalPopup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/padding_xxlarge"
+        android:layout_marginBottom="140dp"
+        android:orientation="vertical"
+        android:background="@drawable/modal_background"
+        android:elevation="8dp"
+        android:padding="@dimen/padding_normal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/btnAddTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_small"
+            android:paddingStart="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_large"
+            android:text="Добавить задачу"
+            android:textColor="#1F2532"
+            android:textSize="@dimen/text_normal" />
+
+        <TextView
+            android:id="@+id/btnAddNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_small"
+            android:paddingStart="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_large"
+            android:text="Добавить заметку"
+            android:textColor="#1F2532"
+            android:textSize="@dimen/text_normal" />
+
+        <TextView
+            android:id="@+id/btnAddHabit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_small"
+            android:paddingStart="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_large"
+            android:text="Добавить привычку"
+            android:textColor="#1F2532"
+            android:textSize="@dimen/text_normal" />
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

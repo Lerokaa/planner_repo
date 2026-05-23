@@ -1,14 +1,14 @@
 package com.example.planner;
 
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
 
 public class OnboardingFragment extends Fragment {
@@ -29,6 +30,7 @@ public class OnboardingFragment extends Fragment {
     private int currentPage = 0;
     private static final int TOTAL_PAGES = 3;
     private boolean isAnimating = false;
+    private GestureDetectorCompat gestureDetector;
 
     private final int[] titles = {
             R.string.onboarding_title_1,
@@ -74,7 +76,36 @@ public class OnboardingFragment extends Fragment {
         btnSkip = view.findViewById(R.id.btnSkip);
 
         createIndicators();
-        updateContent(false); // без анимации при первом показе
+        updateContent(false);
+
+        // Настройка свайпов
+        gestureDetector = new GestureDetectorCompat(getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if (isAnimating) return false;
+
+                float diffX = e2.getX() - e1.getX();
+                if (Math.abs(diffX) > 100 && Math.abs(velocityX) > 100) {
+                    if (diffX > 0) {
+                        // Свайп вправо - предыдущая страница
+                        if (currentPage > 0) {
+                            goToPreviousPageWithSwipe();
+                        }
+                    } else {
+                        // Свайп влево - следующая страница
+                        if (currentPage < TOTAL_PAGES - 1) {
+                            goToNextPageWithSwipe();
+                        } else {
+                            animateExitToCalendar();
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        view.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
 
         btnNext.setOnClickListener(v -> {
             if (!isAnimating) goToNextPage();
@@ -121,11 +152,6 @@ public class OnboardingFragment extends Fragment {
                 params.width = 24;
                 params.height = 24;
                 dot.setLayoutParams(params);
-
-                // Анимация для активной точки
-                Animation pulseAnim = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
-                pulseAnim.setDuration(300);
-                dot.startAnimation(pulseAnim);
             } else {
                 dot.setBackgroundResource(R.drawable.indicator_inactive);
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) dot.getLayoutParams();
@@ -138,6 +164,7 @@ public class OnboardingFragment extends Fragment {
 
     private void updateContent(boolean animate) {
         if (animate) {
+            // Для кнопок используем обычную анимацию без свайпа
             animateContentExit(() -> {
                 updateContentData();
                 animateContentEnter();
@@ -165,12 +192,7 @@ public class OnboardingFragment extends Fragment {
     }
 
     private void animateContentExit(Runnable onComplete) {
-        // Анимация ухода текущего контента
         AnimationSet exitSet = new AnimationSet(true);
-
-        // Затухание и сдвиг вверх
-        Animation fadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
-        fadeOut.setDuration(250);
 
         TranslateAnimation slideUp = new TranslateAnimation(
                 Animation.RELATIVE_TO_SELF, 0,
@@ -181,8 +203,14 @@ public class OnboardingFragment extends Fragment {
         slideUp.setDuration(250);
         slideUp.setInterpolator(new DecelerateInterpolator());
 
-        exitSet.addAnimation(fadeOut);
+        Animation fadeOut = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
+        fadeOut.setDuration(250);
+
         exitSet.addAnimation(slideUp);
+        exitSet.addAnimation(fadeOut);
         exitSet.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -203,8 +231,10 @@ public class OnboardingFragment extends Fragment {
         tvSubtitle.startAnimation(exitSet);
         tvDescription.startAnimation(exitSet);
 
-        // Анимация для кнопок
-        Animation btnFadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+        Animation btnFadeOut = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
         btnFadeOut.setDuration(200);
         btnBack.startAnimation(btnFadeOut);
         btnNext.startAnimation(btnFadeOut);
@@ -212,13 +242,7 @@ public class OnboardingFragment extends Fragment {
     }
 
     private void animateContentEnter() {
-        // Анимация появления нового контента
         AnimationSet enterSet = new AnimationSet(true);
-
-        // Появление с небольшим сдвигом снизу
-        Animation fadeIn = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
-        fadeIn.setDuration(350);
-        fadeIn.setStartOffset(100);
 
         TranslateAnimation slideUpFromBottom = new TranslateAnimation(
                 Animation.RELATIVE_TO_SELF, 0,
@@ -230,8 +254,15 @@ public class OnboardingFragment extends Fragment {
         slideUpFromBottom.setStartOffset(100);
         slideUpFromBottom.setInterpolator(new DecelerateInterpolator());
 
-        enterSet.addAnimation(fadeIn);
+        Animation fadeIn = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
+        fadeIn.setDuration(350);
+        fadeIn.setStartOffset(100);
+
         enterSet.addAnimation(slideUpFromBottom);
+        enterSet.addAnimation(fadeIn);
         enterSet.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {}
@@ -250,49 +281,214 @@ public class OnboardingFragment extends Fragment {
         tvSubtitle.startAnimation(enterSet);
         tvDescription.startAnimation(enterSet);
 
-        // Анимация для кнопок
-        Animation btnFadeIn = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
+        Animation btnFadeIn = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
         btnFadeIn.setDuration(350);
         btnFadeIn.setStartOffset(150);
         btnBack.startAnimation(btnFadeIn);
         btnNext.startAnimation(btnFadeIn);
         btnSkip.startAnimation(btnFadeIn);
-
-        // Анимация для иконки (легкое масштабирование)
-        ScaleAnimation scaleAnim = new ScaleAnimation(
-                0.8f, 1.0f,
-                0.8f, 1.0f,
-                ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
-                ScaleAnimation.RELATIVE_TO_SELF, 0.5f
-        );
-        scaleAnim.setDuration(400);
-        scaleAnim.setStartOffset(100);
-        scaleAnim.setInterpolator(new DecelerateInterpolator());
-        ivIllustration.startAnimation(scaleAnim);
     }
 
     private void goToNextPage() {
         if (currentPage < TOTAL_PAGES - 1) {
-            currentPage++;
-            updateContent(true);
+            goToNextPageWithSwipe();
         } else {
-            if (getActivity() instanceof MainActivity) {
-                // Анимация при завершении онбординга
-                animateExitToCalendar();
-            }
+            animateExitToCalendar();
         }
     }
 
     private void goToPreviousPage() {
         if (currentPage > 0) {
-            currentPage--;
-            updateContent(true);
+            goToPreviousPageWithSwipe();
         }
     }
 
+    private void goToNextPageWithSwipe() {
+        if (isAnimating) return;
+        currentPage++;
+        animateSwipeLeft();
+    }
+
+    private void goToPreviousPageWithSwipe() {
+        if (isAnimating) return;
+        currentPage--;
+        animateSwipeRight();
+    }
+
+    private void animateSwipeLeft() {
+        // Анимация выезда текущего контента влево
+        AnimationSet exitSet = new AnimationSet(true);
+        TranslateAnimation slideOutLeft = new TranslateAnimation(
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, -1f,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0
+        );
+        slideOutLeft.setDuration(300);
+        slideOutLeft.setInterpolator(new DecelerateInterpolator());
+
+        Animation fadeOut = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
+        fadeOut.setDuration(200);
+
+        exitSet.addAnimation(slideOutLeft);
+        exitSet.addAnimation(fadeOut);
+
+        exitSet.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                isAnimating = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                updateContentData();
+                animateSwipeLeftEnter();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        tvTitle.startAnimation(exitSet);
+        ivIllustration.startAnimation(exitSet);
+        tvSubtitle.startAnimation(exitSet);
+        tvDescription.startAnimation(exitSet);
+    }
+
+    private void animateSwipeLeftEnter() {
+        // Анимация въезда нового контента справа
+        AnimationSet enterSet = new AnimationSet(true);
+        TranslateAnimation slideInRight = new TranslateAnimation(
+                Animation.RELATIVE_TO_SELF, 1f,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0
+        );
+        slideInRight.setDuration(300);
+        slideInRight.setInterpolator(new DecelerateInterpolator());
+
+        Animation fadeIn = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
+        fadeIn.setDuration(300);
+
+        enterSet.addAnimation(slideInRight);
+        enterSet.addAnimation(fadeIn);
+
+        enterSet.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                isAnimating = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        tvTitle.startAnimation(enterSet);
+        ivIllustration.startAnimation(enterSet);
+        tvSubtitle.startAnimation(enterSet);
+        tvDescription.startAnimation(enterSet);
+    }
+
+    private void animateSwipeRight() {
+        // Анимация выезда текущего контента вправо
+        AnimationSet exitSet = new AnimationSet(true);
+        TranslateAnimation slideOutRight = new TranslateAnimation(
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 1f,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0
+        );
+        slideOutRight.setDuration(300);
+        slideOutRight.setInterpolator(new DecelerateInterpolator());
+
+        Animation fadeOut = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
+        fadeOut.setDuration(200);
+
+        exitSet.addAnimation(slideOutRight);
+        exitSet.addAnimation(fadeOut);
+
+        exitSet.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                isAnimating = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                updateContentData();
+                animateSwipeRightEnter();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        tvTitle.startAnimation(exitSet);
+        ivIllustration.startAnimation(exitSet);
+        tvSubtitle.startAnimation(exitSet);
+        tvDescription.startAnimation(exitSet);
+    }
+
+    private void animateSwipeRightEnter() {
+        // Анимация въезда нового контента слева
+        AnimationSet enterSet = new AnimationSet(true);
+        TranslateAnimation slideInLeft = new TranslateAnimation(
+                Animation.RELATIVE_TO_SELF, -1f,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0,
+                Animation.RELATIVE_TO_SELF, 0
+        );
+        slideInLeft.setDuration(300);
+        slideInLeft.setInterpolator(new DecelerateInterpolator());
+
+        Animation fadeIn = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
+        fadeIn.setDuration(300);
+
+        enterSet.addAnimation(slideInLeft);
+        enterSet.addAnimation(fadeIn);
+
+        enterSet.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                isAnimating = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        tvTitle.startAnimation(enterSet);
+        ivIllustration.startAnimation(enterSet);
+        tvSubtitle.startAnimation(enterSet);
+        tvDescription.startAnimation(enterSet);
+    }
+
     private void animateExitToCalendar() {
-        // Анимация ухода всего онбординга
-        Animation fadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+        Animation fadeOut = new Animation() {
+            @Override
+            public boolean willChangeBounds() { return false; }
+        };
         fadeOut.setDuration(400);
         fadeOut.setAnimationListener(new Animation.AnimationListener() {
             @Override

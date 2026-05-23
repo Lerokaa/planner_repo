@@ -10,7 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="0dp">
 
         <!-- Верхняя панель -->
         <LinearLayout
@@ -71,7 +72,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Полоса с числами и днями недели (горизонтальный скролл) -->
+        <!-- Полоса с числами и днями недели -->
         <HorizontalScrollView
             android:id="@+id/dateScrollView"
             android:layout_width="match_parent"
@@ -118,6 +119,8 @@
             android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="0dp"
+            android:layout_marginBottom="0dp"
             android:background="#FFFFFF"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu"
@@ -127,21 +130,19 @@
             app:itemTextAppearanceInactive="@style/BottomNavText" />
     </LinearLayout>
 
+    <!-- FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="96dp"
+        android:layout_marginBottom="120dp"
         android:backgroundTint="#4B5C78"
-        android:scaleType="center"
         app:tint="#CCD2DE"
-        app:srcCompat="@drawable/ic_add"
-        app:fabSize="normal"
-        app:elevation="6dp"
-        app:shapeAppearanceOverlay="@style/CircularFloatingActionButton" />
+        app:srcCompat="@drawable/ic_add" />
 
+    <!-- Модальное окно -->
     <View
         android:id="@+id/dimOverlay"
         android:layout_width="match_parent"

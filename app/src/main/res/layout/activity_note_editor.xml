@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- Круглая кнопка назад -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="60dp"
+        android:src="@drawable/ic_back_circle"
+        android:background="@drawable/circle_background"
+        android:contentDescription="Назад"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Контент с прокруткой -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="100dp">
+
+            <!-- Дата создания -->
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Сегодня 20:04"
+                android:textSize="12sp"
+                android:textColor="#8E8E93"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Заголовок заметки -->
+            <EditText
+                android:id="@+id/etTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Закат за окном"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#1C1C1E"
+                android:background="@null"
+                android:paddingBottom="16dp"
+                android:hint="# Заголовок"
+                android:inputType="textMultiLine"
+                android:maxLines="3" />
+
+            <!-- Текст заметки -->
+            <EditText
+                android:id="@+id/etContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Небо окрасилось в неоново-розовый и фиолетовый..."
+                android:textSize="16sp"
+                android:textColor="#1C1C1E"
+                android:background="@null"
+                android:paddingTop="8dp"
+                android:paddingBottom="32dp"
+                android:hint="Введите текст заметки..."
+                android:inputType="textMultiLine"
+                android:gravity="top" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Нижняя панель форматирования -->
+    <LinearLayout
+        android:id="@+id/formatBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="#F8F9FA"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/btnFormatAa"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="Aa"
+            android:textSize="16sp"
+            android:textColor="#007AFF"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/btnFormatBold"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="B"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#007AFF"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/btnFormatItalic"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="I"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            android:textColor="#007AFF"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/btnFormatUnderline"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="U"
+            android:textSize="18sp"
+            android:textColor="#007AFF"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/btnFormatStrike"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="S"
+            android:textSize="18sp"
+            android:textColor="#007AFF"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/btnFormatColor"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="●"
+            android:textSize="20sp"
+            android:textColor="#007AFF"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
