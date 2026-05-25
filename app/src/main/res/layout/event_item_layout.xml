@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp">
+
+    <!-- Цветная полоска слева -->
+    <View
+        android:id="@+id/eventColorBar"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="#4B5C78" />
+
+    <!-- Контейнер события -->
+    <LinearLayout
+        android:id="@+id/eventContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="#80B8E1FF"
+        android:padding="8dp"
+        android:layout_marginStart="4dp"
+        android:radius="8dp">
+
+        <TextView
+            android:id="@+id/eventTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Заголовок"
+            android:textSize="13sp"
+            android:textColor="#1C1C1E"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/eventTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="8:00 - 14:00"
+            android:textSize="11sp"
+            android:textColor="#8E8E93"
+            android:layout_marginTop="2dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

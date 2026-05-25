@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/splash_background">
 
-    <!-- Контейнер для объединения "your" и "Planner" -->
     <LinearLayout
         android:id="@+id/logoContainer"
         android:layout_width="wrap_content"
@@ -15,7 +14,6 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- Текст "your" (выровнен по ПРАВОМУ краю контейнера) -->
         <TextView
             android:id="@+id/tvYour"
             android:layout_width="wrap_content"
@@ -32,7 +30,6 @@
             app:autoSizeStepGranularity="2sp"
             app:autoSizeTextType="uniform" />
 
-        <!-- Текст "Planner" (по центру или слева — настройте layout_gravity при необходимости) -->
         <TextView
             android:id="@+id/tvPlanner"
             android:layout_width="wrap_content"
@@ -52,16 +49,15 @@
 
     </LinearLayout>
 
-    <!-- Год внизу -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="@dimen/padding_xxlarge"
         android:fontFamily="sans-serif-condensed-medium"
         android:text="2026"
         android:textColor="#1F2532"
-        android:textSize="14sp" />
+        android:textSize="@dimen/text_medium" />
 
 </RelativeLayout>

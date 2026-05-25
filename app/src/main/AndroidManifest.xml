@@ -11,20 +11,85 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Planner">
+
+        <!-- Главная Activity со сплэшем и онбордингом -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Planner">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Календарь -->
+        <activity
+            android:name=".CalendarActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
 
-        <activity android:name=".SettingsActivity" />
+        <!-- Задачи -->
+        <activity
+            android:name=".TasksActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
 
-        <activity android:name=".TasksFragment" />
+        <!-- Заметки -->
+        <activity
+            android:name=".NotesActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- Привычки -->
+        <activity
+            android:name=".HabitsActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- Настройки -->
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- Тестовая активити -->
+        <activity
+            android:name=".TestActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".NoteEditorActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".NotesActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".AddNoteActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".NotesActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".TaskEditorActivity"
+            android:parentActivityName=".TasksActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".AddTaskActivity"
+            android:parentActivityName=".TasksActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".AddHabitActivity"
+            android:parentActivityName=".HabitsActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".HabitEditorActivity"
+            android:parentActivityName=".HabitsActivity"
+            android:windowSoftInputMode="adjustResize" />
 
 
     </application>
