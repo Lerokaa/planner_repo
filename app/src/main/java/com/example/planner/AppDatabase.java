@@ -1,20 +1,23 @@
 package com.example.planner;
 
 import android.content.Context;
-
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import java.util.concurrent.ExecutorService;        // ← Добавить
+import java.util.concurrent.Executors;             // ← Добавить
 
 @Database(entities = {Note.class, Task.class, Reminder.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
 
+    // ← Добавить эту строку:
+    public static final ExecutorService databaseWriteExecutor =
+            Executors.newFixedThreadPool(4);
+
     public abstract NoteDao noteDao();
-
     public abstract TaskDao taskDao();
-
     public abstract ReminderDao reminderDao();
 
     public static synchronized AppDatabase getInstance(Context context) {

@@ -1,16 +1,17 @@
 package com.example.planner;
 
+import androidx.lifecycle.LiveData;  // ← Добавлен
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 import java.util.List;
 
 @Dao
 public interface NoteDao {
-
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Note note);
 
     @Update
@@ -20,8 +21,8 @@ public interface NoteDao {
     void delete(Note note);
 
     @Query("SELECT * FROM notes ORDER BY lastModified DESC")
-    List<Note> getAllNotes();
+    LiveData<List<Note>> getAllNotes();  // Теперь работает ✅
 
     @Query("SELECT * FROM notes WHERE id = :id")
-    Note getNoteById(long id);
+    LiveData<Note> getNoteByIdLiveData(long id);
 }

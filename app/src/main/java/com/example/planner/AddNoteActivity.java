@@ -11,25 +11,29 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class AddNoteActivity extends AppCompatActivity {
-
     private ImageButton btnBack;
     private TextView btnDone;
     private TextView tvDate;
     private EditText etTitle;
     private EditText etContent;
 
+    private NoteViewModel viewModel;
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", new Locale("ru"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
+
+        // Инициализация ViewModel
+        viewModel = new ViewModelProvider(this).get(NoteViewModel.class);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -43,7 +47,6 @@ public class AddNoteActivity extends AppCompatActivity {
         updateDate();
         showKeyboard();
 
-        // Кнопка "Готово" всегда видима
         btnDone.setVisibility(View.VISIBLE);
     }
 
@@ -100,12 +103,20 @@ public class AddNoteActivity extends AppCompatActivity {
             }
         }
 
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("note_title", newTitle);
-        resultIntent.putExtra("note_content", newContent);
-        resultIntent.putExtra("note_timestamp", System.currentTimeMillis());
+        if (newTitle.isEmpty() && newContent.isEmpty()) {
+            finish();
+            return;
+        }
 
-        setResult(RESULT_OK, resultIntent);
+        // 🔥 СОЗДАЕМ И СОХРАНЯЕМ ЗАМЕТКУ В БАЗУ
+        Note note = new Note();
+        note.title = newTitle;
+        note.content = newContent;
+        note.lastModified = System.currentTimeMillis();
+
+        viewModel.insert(note);
+
+        Toast.makeText(this, "Заметка сохранена", Toast.LENGTH_SHORT).show();
         finish();
     }
 }
