@@ -28,4 +28,7 @@ public interface TaskDao {
 
     @Query("UPDATE tasks SET isCompleted = :completed WHERE id = :taskId")
     void updateCompletion(long taskId, boolean completed);
+
+    @Query("SELECT * FROM tasks WHERE date = :date ORDER BY startTime ASC")
+    LiveData<List<Task>> getTasksByDate(long date);
 }

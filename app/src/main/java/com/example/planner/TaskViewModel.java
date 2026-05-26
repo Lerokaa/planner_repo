@@ -37,4 +37,8 @@ public class TaskViewModel extends AndroidViewModel {
         AppDatabase.databaseWriteExecutor.execute(() ->
                 taskDao.updateCompletion(taskId, completed));
     }
+
+    public LiveData<List<Task>> getTasksByDate(long date) {
+        return taskDao.getTasksByDate(date);
+    }
 }
