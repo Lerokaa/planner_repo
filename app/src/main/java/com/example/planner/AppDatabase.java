@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;        // ← Добавить
 import java.util.concurrent.Executors;             // ← Добавить
 
-@Database(entities = {Note.class, Task.class, Reminder.class}, version = 3)
+@Database(entities = {Note.class, Task.class, Reminder.class}, version = 4)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;

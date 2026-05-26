@@ -1,17 +1,17 @@
 package com.example.planner;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
-
 import java.util.List;
 
 @Dao
 public interface TaskDao {
-
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Task task);
 
     @Update
@@ -20,12 +20,12 @@ public interface TaskDao {
     @Delete
     void delete(Task task);
 
-    @Query("SELECT * FROM tasks ORDER BY date ASC")
-    List<Task> getAllTasks();
+    @Query("SELECT * FROM tasks ORDER BY date ASC, startTime ASC")
+    LiveData<List<Task>> getAllTasks();
 
     @Query("SELECT * FROM tasks WHERE id = :id")
-    Task getTask(long id);
+    Task getTaskById(long id);
 
-    @Query("UPDATE tasks SET isCompleted = :isCompleted WHERE id = :taskId")
-    void updateTaskCompletion(long taskId, boolean isCompleted);
+    @Query("UPDATE tasks SET isCompleted = :completed WHERE id = :taskId")
+    void updateCompletion(long taskId, boolean completed);
 }
