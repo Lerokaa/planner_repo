@@ -36,6 +36,15 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <ImageButton
+            android:id="@+id/btnDelete"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_delete"
+            android:background="@drawable/circle_background"
+            android:contentDescription="Удалить"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/btnDone"
             android:layout_width="wrap_content"

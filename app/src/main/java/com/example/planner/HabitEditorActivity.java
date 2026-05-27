@@ -38,6 +38,7 @@ public class HabitEditorActivity extends AppCompatActivity {
     private Calendar selectedTime = Calendar.getInstance();
     private boolean hasTime = false;
     private int targetDays = 0;
+    private ImageButton btnDelete;
 
     private boolean[] selectedDays = new boolean[7];
     private String[] dayNames = {"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"};
@@ -76,6 +77,33 @@ public class HabitEditorActivity extends AppCompatActivity {
         updateColorTheme();
     }
 
+    private void deleteHabit() {
+        if (habitId <= 0) return;
+
+        new AlertDialog.Builder(this)
+                .setTitle("Удаление привычки")
+                .setMessage("Вы уверены, что хотите удалить эту привычку?")
+                .setPositiveButton("Удалить", (dialog, which) -> {
+
+                    Executors.newSingleThreadExecutor().execute(() -> {
+
+                        Habit habit = habitDao.getHabitById(habitId);
+
+                        if (habit != null) {
+                            habitDao.delete(habit);
+
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Привычка удалена", Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
+                                finish();
+                            });
+                        }
+                    });
+                })
+                .setNegativeButton("Отмена", null)
+                .show();
+    }
+
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         btnSave = findViewById(R.id.btnDone);
@@ -86,6 +114,7 @@ public class HabitEditorActivity extends AppCompatActivity {
         weekDaysContainer = findViewById(R.id.weekDaysContainer);
         tvTime = findViewById(R.id.tvTime);
         tvTargetDays = findViewById(R.id.tvTargetDays);
+        btnDelete = findViewById(R.id.btnDelete);
 
         colorViews = new View[8];
         colorViews[0] = findViewById(R.id.color0);
@@ -207,6 +236,7 @@ public class HabitEditorActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         btnSave.setOnClickListener(v -> saveHabit());
         tvTime.setOnClickListener(v -> showTimePicker());
+        btnDelete.setOnClickListener(v -> deleteHabit());
     }
 
     private void showTimePicker() {
@@ -250,71 +280,45 @@ public class HabitEditorActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
 
-                etName.setText(habit.name);
+                // 🔥 показываем кнопку ТОЛЬКО если реально есть привычка
+                btnDelete.setVisibility(View.VISIBLE);
 
+                etName.setText(habit.name);
                 etDescription.setText(habit.description);
 
                 selectedColor = habit.color;
 
                 if (habit.time > 0) {
-
                     hasTime = true;
-
                     selectedTime.setTimeInMillis(habit.time);
-
                     updateTimeDisplay();
                 }
 
                 if (habit.targetDays == 0) {
-
                     tvTargetDays.setText("Бесконечная");
-
                 } else {
-
-                    tvTargetDays.setText(
-                            habit.targetDays + " дней"
-                    );
+                    tvTargetDays.setText(habit.targetDays + " дней");
                 }
 
                 targetDays = habit.targetDays;
 
-                // ДНИ НЕДЕЛИ
-
                 String schedule = habit.schedule;
 
                 for (int i = 0; i < dayNames.length; i++) {
-
                     if (schedule.contains(dayNames[i])) {
-
                         selectedDays[i] = true;
-
-                        updateDayButtonStyle(
-                                dayButtons[i],
-                                true
-                        );
+                        updateDayButtonStyle(dayButtons[i], true);
                     }
                 }
 
-                // ЦВЕТ
-
                 String[] colorArray = {
-                        "#FF6B6B",
-                        "#4ECDC4",
-                        "#45B7D1",
-                        "#96CEB4",
-                        "#FFEAA7",
-                        "#DDA0DD",
-                        "#FF8C42",
-                        "#A8E6CF"
+                        "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4",
+                        "#FFEAA7", "#DDA0DD", "#FF8C42", "#A8E6CF"
                 };
 
                 for (int i = 0; i < colorArray.length; i++) {
-
-                    if (Color.parseColor(colorArray[i])
-                            == selectedColor) {
-
+                    if (Color.parseColor(colorArray[i]) == selectedColor) {
                         updateColorSelection(i);
-
                         break;
                     }
                 }
