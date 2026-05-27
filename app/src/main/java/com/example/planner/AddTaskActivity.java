@@ -13,11 +13,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
+import androidx.lifecycle.ViewModelProvider;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -35,7 +34,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private View colorBarTop;
     private View colorBarLeft;
 
-    private int selectedColor = Color.parseColor("#4B5C78");
+    private int selectedColor = Color.parseColor("#FF6B6B");
     private Calendar selectedDate = Calendar.getInstance();
     private Calendar startTime = Calendar.getInstance();
     private Calendar endTime = Calendar.getInstance();
@@ -43,13 +42,19 @@ public class AddTaskActivity extends AppCompatActivity {
 
     private View[] colorViews;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", new Locale("ru"));
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", new Locale("ru"));
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", new Locale("ru"));
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", new Locale("ru"));
+
+    // 🔥 Добавляем ViewModel
+    private TaskViewModel taskViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+
+        // 🔥 Инициализация ViewModel
+        taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -67,6 +72,9 @@ public class AddTaskActivity extends AppCompatActivity {
 
         // Кнопка "Готово" всегда видима
         btnDone.setVisibility(View.VISIBLE);
+
+        updateColorTheme();
+        updateColorSelection(0); // 0 = первый цвет в палитре (красный)
     }
 
     private void initViews() {
@@ -93,7 +101,7 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
     private void setupColorPicker() {
-        String[] colorArray = {"#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#FF8C42", "#A8E6CF"};
+        String[] colorArray = { "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#FF8C42", "#A8E6CF" };
 
         for (int i = 0; i < colorViews.length; i++) {
             final int colorValue = Color.parseColor(colorArray[i]);
@@ -213,6 +221,10 @@ public class AddTaskActivity extends AppCompatActivity {
         }
     }
 
+    private int getMinutesFromMidnight(Calendar cal) {
+        return cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
+    }
+
     private void saveAndClose() {
         String title = etTitle.getText().toString().trim();
         if (title.isEmpty()) {
@@ -222,15 +234,30 @@ public class AddTaskActivity extends AppCompatActivity {
 
         String description = etDescription.getText().toString().trim();
 
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("task_title", title);
-        resultIntent.putExtra("task_description", description);
-        resultIntent.putExtra("task_color", selectedColor);
-        resultIntent.putExtra("task_date", selectedDate.getTimeInMillis());
-        resultIntent.putExtra("task_start_time", startTime.getTimeInMillis());
-        resultIntent.putExtra("task_end_time", hasEndTime ? endTime.getTimeInMillis() : -1);
+        Task task = new Task();
+        // 🔥 НЕ пишите task.id = ... ! Room сам присвоит уникальный ID
+        task.title = title;
+        task.description = description;
 
-        setResult(RESULT_OK, resultIntent);
+        // Дата (обнуляем время, чтобы задачи группировались по дням)
+        Calendar startOfDay = (Calendar) selectedDate.clone();
+        startOfDay.set(Calendar.HOUR_OF_DAY, 0);
+        startOfDay.set(Calendar.MINUTE, 0);
+        startOfDay.set(Calendar.SECOND, 0);
+        startOfDay.set(Calendar.MILLISECOND, 0);
+        task.date = startOfDay.getTimeInMillis();
+
+        // Время в минутах от полуночи
+        task.startTime = getMinutesFromMidnight(startTime);
+        task.endTime = hasEndTime ? getMinutesFromMidnight(endTime) : -1;
+
+        task.isCompleted = false;
+        task.color = selectedColor;
+
+        // Сохранение в БД
+        TaskViewModel viewModel = new ViewModelProvider(this).get(TaskViewModel.class);
+        viewModel.insert(task);
+
         finish();
     }
 

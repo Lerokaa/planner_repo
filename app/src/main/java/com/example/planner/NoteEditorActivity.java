@@ -1,13 +1,8 @@
 package com.example.planner;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextWatcher;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
@@ -21,9 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -34,41 +30,40 @@ public class NoteEditorActivity extends AppCompatActivity {
     private EditText etTitle;
     private EditText etContent;
     private LinearLayout formatBar;
-
     private TextView btnFormatAa, btnFormatBold, btnFormatItalic;
     private TextView btnFormatUnderline, btnFormatStrike, btnFormatColor;
 
-    private String noteTitle;
-    private String noteContent;
-    private long noteTimestamp;
-    private int notePosition;
+    private NoteViewModel viewModel;
+    private long noteId = -1;
 
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", new Locale("ru"));
-    private SimpleDateFormat fullDateFormat = new SimpleDateFormat("d MMMM yyyy, HH:mm", new Locale("ru"));
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", new Locale("ru"));
+    private final SimpleDateFormat fullDateFormat = new SimpleDateFormat("d MMMM yyyy, HH:mm", new Locale("ru"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_editor);
 
-        // Получаем данные
-        if (getIntent().hasExtra("note_title")) {
-            noteTitle = getIntent().getStringExtra("note_title");
-            noteContent = getIntent().getStringExtra("note_content");
-            noteTimestamp = getIntent().getLongExtra("note_timestamp", System.currentTimeMillis());
-            notePosition = getIntent().getIntExtra("note_position", -1);
-        } else {
-            noteTitle = "";
-            noteContent = "";
-            noteTimestamp = System.currentTimeMillis();
-            notePosition = -1;
-        }
+        viewModel = new ViewModelProvider(this).get(NoteViewModel.class);
+        noteId = getIntent().getLongExtra("note_id", -1);
 
         initViews();
         setupListeners();
-        updateDateDisplay();
         setupFormatBar();
-        showKeyboardIfNeeded();
+
+        if (noteId > 0) {
+            // 🔥 Наблюдаем за заметкой из БД
+            viewModel.getNoteById(noteId).observe(this, note -> {
+                if (note != null) {
+                    etTitle.setText(note.title);
+                    etContent.setText(note.content);
+                    updateDateDisplay(note.lastModified);
+                }
+            });
+        } else {
+            updateDateDisplay(System.currentTimeMillis());
+            showKeyboardIfNeeded();
+        }
     }
 
     private void initViews() {
@@ -77,54 +72,30 @@ public class NoteEditorActivity extends AppCompatActivity {
         etTitle = findViewById(R.id.etTitle);
         etContent = findViewById(R.id.etContent);
         formatBar = findViewById(R.id.formatBar);
-
         btnFormatAa = findViewById(R.id.btnFormatAa);
         btnFormatBold = findViewById(R.id.btnFormatBold);
         btnFormatItalic = findViewById(R.id.btnFormatItalic);
         btnFormatUnderline = findViewById(R.id.btnFormatUnderline);
         btnFormatStrike = findViewById(R.id.btnFormatStrike);
         btnFormatColor = findViewById(R.id.btnFormatColor);
-
-        etTitle.setText(noteTitle);
-        etContent.setText(noteContent);
     }
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> saveAndClose());
 
-        // Показываем панель форматирования при фокусе на поле ввода
-        View.OnFocusChangeListener focusListener = (v, hasFocus) -> {
-            if (hasFocus) {
-                formatBar.setVisibility(View.VISIBLE);
-            }
-        };
+        View.OnFocusChangeListener focusListener = (v, hasFocus) ->
+                formatBar.setVisibility(hasFocus ? View.VISIBLE : View.GONE);
 
         etTitle.setOnFocusChangeListener(focusListener);
         etContent.setOnFocusChangeListener(focusListener);
-
-        // Скрываем панель при скролле (опционально)
-        findViewById(R.id.scrollView).setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            // Можно скрывать панель при скролле
-        });
     }
 
     private void setupFormatBar() {
-        // Aa - настройки шрифта (показать диалог выбора размера)
         btnFormatAa.setOnClickListener(v -> showFontSizeDialog());
-
-        // B - жирный
         btnFormatBold.setOnClickListener(v -> applyStyle(new StyleSpan(android.graphics.Typeface.BOLD)));
-
-        // I - курсив
         btnFormatItalic.setOnClickListener(v -> applyStyle(new StyleSpan(android.graphics.Typeface.ITALIC)));
-
-        // U - подчеркнутый
         btnFormatUnderline.setOnClickListener(v -> applyStyle(new UnderlineSpan()));
-
-        // S - зачеркнутый
         btnFormatStrike.setOnClickListener(v -> applyStyle(new StrikethroughSpan()));
-
-        // ● - цвет текста
         btnFormatColor.setOnClickListener(v -> showColorPickerDialog());
     }
 
@@ -153,26 +124,21 @@ public class NoteEditorActivity extends AppCompatActivity {
 
     private void showFontSizeDialog() {
         final String[] sizes = {"Маленький", "Средний", "Большой", "Огромный"};
-        final int[] sizeValues = {12, 16, 20, 28};
+        final float[] sizeValues = {12, 16, 20, 28};
 
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Размер шрифта")
                 .setItems(sizes, (dialog, which) -> {
                     EditText editText = getCurrentFocusEditText();
-                    if (editText != null) {
-                        editText.setTextSize(sizeValues[which]);
-                    }
-                })
-                .show();
+                    if (editText != null) editText.setTextSize(sizeValues[which]);
+                }).show();
     }
 
     private void showColorPickerDialog() {
         final String[] colors = {"Черный", "Красный", "Синий", "Зеленый", "Оранжевый"};
         final int[] colorValues = {
-                android.graphics.Color.BLACK,
-                android.graphics.Color.RED,
-                android.graphics.Color.BLUE,
-                android.graphics.Color.GREEN,
+                android.graphics.Color.BLACK, android.graphics.Color.RED,
+                android.graphics.Color.BLUE, android.graphics.Color.GREEN,
                 android.graphics.Color.rgb(255, 165, 0)
         };
 
@@ -188,36 +154,29 @@ public class NoteEditorActivity extends AppCompatActivity {
                             spannable.setSpan(new ForegroundColorSpan(colorValues[which]), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             editText.setText(spannable);
                             editText.setSelection(start, end);
-                        } else {
-                            Toast.makeText(this, "Выделите текст для изменения цвета", Toast.LENGTH_SHORT).show();
                         }
                     }
-                })
-                .show();
+                }).show();
     }
 
     private void showKeyboardIfNeeded() {
-        if (noteTitle.isEmpty() && noteContent.isEmpty()) {
+        if (etTitle.getText().toString().trim().isEmpty()) {
             etTitle.requestFocus();
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(etTitle, InputMethodManager.SHOW_IMPLICIT);
         }
     }
 
-    private void updateDateDisplay() {
-        Date date = new Date(noteTimestamp);
-        String formattedDate;
+    private void updateDateDisplay(long timestamp) {
+        Date date = new Date(timestamp);
+        Calendar noteCal = Calendar.getInstance();
+        noteCal.setTimeInMillis(timestamp);
+        Calendar today = Calendar.getInstance();
 
-        java.util.Calendar noteCal = java.util.Calendar.getInstance();
-        noteCal.setTimeInMillis(noteTimestamp);
-        java.util.Calendar today = java.util.Calendar.getInstance();
-
-        if (noteCal.get(java.util.Calendar.YEAR) == today.get(java.util.Calendar.YEAR) &&
-                noteCal.get(java.util.Calendar.DAY_OF_YEAR) == today.get(java.util.Calendar.DAY_OF_YEAR)) {
-            formattedDate = "Сегодня " + timeFormat.format(date);
-        } else {
-            formattedDate = fullDateFormat.format(date);
-        }
+        String formattedDate = (noteCal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                noteCal.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR))
+                ? "Сегодня " + timeFormat.format(date)
+                : fullDateFormat.format(date);
 
         tvDate.setText(formattedDate);
     }
@@ -232,21 +191,21 @@ public class NoteEditorActivity extends AppCompatActivity {
         }
 
         if (newTitle.isEmpty() && !newContent.isEmpty()) {
-            if (newContent.length() > 50) {
-                newTitle = newContent.substring(0, 50) + "...";
-            } else {
-                newTitle = newContent;
-            }
+            newTitle = newContent.length() > 50 ? newContent.substring(0, 50) + "..." : newContent;
         }
 
-        android.content.Intent resultIntent = new Intent();
-        resultIntent.putExtra("note_title", newTitle);
-        resultIntent.putExtra("note_content", newContent);
-        resultIntent.putExtra("note_timestamp", System.currentTimeMillis());
-        resultIntent.putExtra("note_position", notePosition);
+        Note note = new Note();
+        note.id = noteId;
+        note.title = newTitle;
+        note.content = newContent;
+        note.lastModified = System.currentTimeMillis();
 
-        setResult(RESULT_OK, resultIntent);
+        if (noteId > 0) {
+            viewModel.update(note);
+        } else {
+            viewModel.insert(note);
+        }
+
         finish();
     }
-
 }

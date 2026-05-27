@@ -32,40 +32,33 @@ android {
 }
 
 dependencies {
-    // Обязательно для OnBackPressedDispatcher
-    implementation("androidx.activity:activity:1.8.0")
-    implementation("androidx.fragment:fragment:1.6.2")
     // Material Design
-    implementation("com.google.android.material:material:1.9.0")
-    // ViewPager
-    implementation("androidx.viewpager:viewpager:1.0.0")
+    implementation("com.google.android.material:material:1.11.0")
+
     // ConstraintLayout
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
+    // ViewPager
+    implementation("androidx.viewpager:viewpager:1.0.0")
+
+    // Circle ImageView
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
-    // Для анимаций и Material Design
-    implementation ("com.google.android.material:material:1.11.0")
-    implementation ("androidx.constraintlayout:constraintlayout:2.1.")
+    // Room Database
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
 
-    // Для Room (если используете)
-    implementation ("androidx.room:room-runtime:2.6.1")
-    annotationProcessor ("androidx.room:room-compiler:2.6.1")
+    // ViewModel и LiveData
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.7.0")
 
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.activity)
-    implementation(libs.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    // Activity и Fragment
+    implementation("androidx.activity:activity:1.8.0")
+    implementation("androidx.fragment:fragment:1.6.2")
 
-    implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-
-
+    // Тесты
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
