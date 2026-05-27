@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.Executors;
 
 public class HabitEditorActivity extends AppCompatActivity {
 
@@ -47,10 +48,16 @@ public class HabitEditorActivity extends AppCompatActivity {
     private boolean isEditMode = false;
     private long habitId = -1;
 
+    private HabitDao habitDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_habit);
+
+        AppDatabase db = AppDatabase.getInstance(this);
+
+        habitDao = db.habitDao();
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -224,91 +231,185 @@ public class HabitEditorActivity extends AppCompatActivity {
     }
 
     private void loadHabitData() {
-        if (getIntent().hasExtra("habit_name")) {
-            isEditMode = true;
-            String name = getIntent().getStringExtra("habit_name");
-            String description = getIntent().getStringExtra("habit_description");
-            int color = getIntent().getIntExtra("habit_color", Color.parseColor("#4B5C78"));
-            boolean[] days = getIntent().getBooleanArrayExtra("habit_days");
-            boolean hasTimeFlag = getIntent().getBooleanExtra("habit_has_time", false);
-            long time = getIntent().getLongExtra("habit_time", -1);
-            targetDays = getIntent().getIntExtra("habit_target_days", 0);
-            habitId = getIntent().getLongExtra("habit_id", -1);
 
-            etName.setText(name);
-            etDescription.setText(description);
-            selectedColor = color;
+        habitId = getIntent().getLongExtra("habit_id", -1);
 
-            if (days != null) {
-                for (int i = 0; i < days.length && i < selectedDays.length; i++) {
-                    selectedDays[i] = days[i];
-                    if (dayButtons[i] != null) {
-                        updateDayButtonStyle(dayButtons[i], selectedDays[i]);
-                    }
-                }
-            }
-
-            if (hasTimeFlag && time != -1) {
-                hasTime = true;
-                selectedTime.setTimeInMillis(time);
-                updateTimeDisplay();
-            }
-
-            if (targetDays == 0) {
-                tvTargetDays.setText("Бесконечная");
-            } else {
-                tvTargetDays.setText(targetDays + " дней");
-            }
-
-            // Обновляем выделение цвета
-            String[] colorArray = {"#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#FF8C42", "#A8E6CF"};
-            for (int i = 0; i < colorArray.length; i++) {
-                if (Color.parseColor(colorArray[i]) == color) {
-                    updateColorSelection(i);
-                    break;
-                }
-            }
-            updateColorTheme();
-        }
-    }
-
-    private void saveHabit() {
-        String name = etName.getText().toString().trim();
-        if (name.isEmpty()) {
-            Toast.makeText(this, "Введите название привычки", Toast.LENGTH_SHORT).show();
+        if (habitId == -1) {
             return;
         }
 
-        String description = etDescription.getText().toString().trim();
+        isEditMode = true;
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+
+            Habit habit = habitDao.getHabitById(habitId);
+
+            if (habit == null) {
+                return;
+            }
+
+            runOnUiThread(() -> {
+
+                etName.setText(habit.name);
+
+                etDescription.setText(habit.description);
+
+                selectedColor = habit.color;
+
+                if (habit.time > 0) {
+
+                    hasTime = true;
+
+                    selectedTime.setTimeInMillis(habit.time);
+
+                    updateTimeDisplay();
+                }
+
+                if (habit.targetDays == 0) {
+
+                    tvTargetDays.setText("Бесконечная");
+
+                } else {
+
+                    tvTargetDays.setText(
+                            habit.targetDays + " дней"
+                    );
+                }
+
+                targetDays = habit.targetDays;
+
+                // ДНИ НЕДЕЛИ
+
+                String schedule = habit.schedule;
+
+                for (int i = 0; i < dayNames.length; i++) {
+
+                    if (schedule.contains(dayNames[i])) {
+
+                        selectedDays[i] = true;
+
+                        updateDayButtonStyle(
+                                dayButtons[i],
+                                true
+                        );
+                    }
+                }
+
+                // ЦВЕТ
+
+                String[] colorArray = {
+                        "#FF6B6B",
+                        "#4ECDC4",
+                        "#45B7D1",
+                        "#96CEB4",
+                        "#FFEAA7",
+                        "#DDA0DD",
+                        "#FF8C42",
+                        "#A8E6CF"
+                };
+
+                for (int i = 0; i < colorArray.length; i++) {
+
+                    if (Color.parseColor(colorArray[i])
+                            == selectedColor) {
+
+                        updateColorSelection(i);
+
+                        break;
+                    }
+                }
+
+                updateColorTheme();
+            });
+        });
+    }
+
+    private void saveHabit() {
+
+        String name = etName.getText().toString().trim();
+
+        if (name.isEmpty()) {
+
+            Toast.makeText(
+                    this,
+                    "Введите название привычки",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        String description =
+                etDescription.getText().toString().trim();
 
         StringBuilder daysStr = new StringBuilder();
+
         for (int i = 0; i < selectedDays.length; i++) {
+
             if (selectedDays[i]) {
-                if (daysStr.length() > 0) daysStr.append(", ");
+
+                if (daysStr.length() > 0) {
+
+                    daysStr.append(", ");
+                }
+
                 daysStr.append(dayNames[i]);
             }
         }
-        String schedule = daysStr.length() > 0 ? daysStr.toString() : "Не выбрано";
+
+        String tempSchedule =
+                daysStr.length() > 0
+                        ? daysStr.toString()
+                        : "Не выбрано";
+
         if (hasTime) {
-            schedule += " в " + timeFormat.format(selectedTime.getTime());
+
+            tempSchedule += " в " +
+                    timeFormat.format(selectedTime.getTime());
         }
 
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("habit_name", name);
-        resultIntent.putExtra("habit_description", description);
-        resultIntent.putExtra("habit_color", selectedColor);
-        resultIntent.putExtra("habit_schedule", schedule);
-        resultIntent.putExtra("habit_days", selectedDays);
-        resultIntent.putExtra("habit_has_time", hasTime);
-        resultIntent.putExtra("habit_target_days", targetDays);
-        resultIntent.putExtra("habit_id", habitId);
-        resultIntent.putExtra("is_edit", isEditMode);
-        if (hasTime) {
-            resultIntent.putExtra("habit_time", selectedTime.getTimeInMillis());
-        }
+        final String schedule = tempSchedule;
 
-        setResult(RESULT_OK, resultIntent);
-        finish();
+        Executors.newSingleThreadExecutor().execute(() -> {
+
+            Habit habit =
+                    habitDao.getHabitById(habitId);
+
+            if (habit == null) {
+                return;
+            }
+
+            habit.name = name;
+
+            habit.description = description;
+
+            habit.color = selectedColor;
+
+            habit.schedule = schedule;
+
+            habit.targetDays = targetDays;
+
+            if (hasTime) {
+
+                habit.time =
+                        selectedTime.getTimeInMillis();
+            }
+
+            habitDao.update(habit);
+
+            runOnUiThread(() -> {
+
+                Toast.makeText(
+                        this,
+                        "Изменения сохранены",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                setResult(RESULT_OK);
+
+                finish();
+            });
+        });
     }
 
     private int dpToPx(int dp) {
