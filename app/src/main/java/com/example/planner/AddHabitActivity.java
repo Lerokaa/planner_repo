@@ -37,7 +37,7 @@ public class AddHabitActivity extends AppCompatActivity {
 
     private TextView tvReminder;
 
-    private int selectedColor = Color.parseColor("#4B5C78");
+    private int selectedColor = Color.parseColor("#FF6B6B");
     private Calendar selectedTime = Calendar.getInstance();
     private boolean hasTime = false;
     private int targetDays = 0; // 0 = бесконечная

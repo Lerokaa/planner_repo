@@ -34,7 +34,7 @@ public class HabitEditorActivity extends AppCompatActivity {
     private TextView tvTime;
     private TextView tvTargetDays;
 
-    private int selectedColor = Color.parseColor("#4B5C78");
+    private int selectedColor = Color.parseColor("#FF6B6B");
     private Calendar selectedTime = Calendar.getInstance();
     private boolean hasTime = false;
     private int targetDays = 0;
