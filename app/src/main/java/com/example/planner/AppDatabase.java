@@ -7,7 +7,11 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;        // ← Добавить
 import java.util.concurrent.Executors;             // ← Добавить
 
-@Database(entities = {Note.class, Task.class, Reminder.class}, version = 4)
+@Database(
+        entities = {Note.class, Task.class, Reminder.class, Habit.class},
+        version = 4,
+        exportSchema = false
+)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
@@ -19,6 +23,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract NoteDao noteDao();
     public abstract TaskDao taskDao();
     public abstract ReminderDao reminderDao();
+    public abstract HabitDao habitDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
