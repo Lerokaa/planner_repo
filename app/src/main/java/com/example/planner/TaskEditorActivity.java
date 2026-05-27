@@ -46,6 +46,8 @@ public class TaskEditorActivity extends AppCompatActivity {
     private View[] colorViews;
     private long taskId = -1;
 
+    private TextView btnDelete;
+
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", new Locale("ru"));
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", new Locale("ru"));
 
@@ -64,19 +66,18 @@ public class TaskEditorActivity extends AppCompatActivity {
         setupColorPicker();
 
         if (taskId > 0) {
-            // 🔥 Загружаем существующую задачу из БД
+            btnDelete.setVisibility(View.VISIBLE);
             loadTaskFromDb();
         } else {
-            // Новая задача — дата сегодня
+            btnDelete.setVisibility(View.GONE);
+
             selectedColor = Color.parseColor("#FF6B6B");
             updateDateTimeDisplay();
             showKeyboardIfNeeded();
         }
 
         updateColorTheme();
-
-        updateColorTheme();
-        updateColorSelection(0); // 0 = первый цвет в палитре (красный)
+        updateColorSelection(0);
     }
 
     // 🔥 Загрузка из БД в фоновом потоке
@@ -125,6 +126,11 @@ public class TaskEditorActivity extends AppCompatActivity {
         titleContainer = findViewById(R.id.titleContainer);
         colorBarTop = findViewById(R.id.colorBarTop);
         colorBarLeft = findViewById(R.id.colorBarLeft);
+        btnDelete = findViewById(R.id.btnDelete);
+
+        if (btnDelete != null) {
+            btnDelete.setVisibility(View.GONE);
+        }
 
         colorViews = new View[8];
         colorViews[0] = findViewById(R.id.color0);
@@ -137,9 +143,39 @@ public class TaskEditorActivity extends AppCompatActivity {
         colorViews[7] = findViewById(R.id.color7);
     }
 
+    private void deleteTask() {
+        if (taskId <= 0) return;
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Удаление задачи")
+                .setMessage("Вы уверены, что хотите удалить эту задачу?")
+                .setPositiveButton("Удалить", (dialog, which) -> {
+                    AppDatabase.databaseWriteExecutor.execute(() -> {
+                        Task task = AppDatabase.getInstance(this)
+                                .taskDao()
+                                .getTaskById(taskId);
+
+                        if (task != null) {
+                            AppDatabase.getInstance(this)
+                                    .taskDao()
+                                    .delete(task);
+
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Задача удалена", Toast.LENGTH_SHORT).show();
+                                finish();
+                            });
+                        }
+                    });
+                })
+                .setNegativeButton("Отмена", null)
+                .show();
+    }
+
     private void setupListeners() {
         // 🔥 Кнопка НАЗАД теперь просто закрывает экран (отмена изменений)
         btnBack.setOnClickListener(v -> finish());
+
+        btnDelete.setOnClickListener(v -> deleteTask());
 
         // Кнопка СОХРАНИТЬ выполняет сохранение
         btnSave.setOnClickListener(v -> saveAndClose());
