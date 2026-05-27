@@ -573,9 +573,15 @@ public class CalendarActivity extends BaseActivity {
     }
 
     private View createCalendarItemView(CalendarItem item, int columnWidth) {
-        int colorInt = ColorHelper.getColorForTitle(item.title);
-        String color = String.format("#%06X", (0xFFFFFF & colorInt));
-        String transparentColor = "#99" + color.substring(1);
+        int colorInt = item.taskId != 0 ? getTaskColor(item.taskId) : Color.GRAY;
+
+        // нормальный полупрозрачный фон
+        int bgColor = Color.argb(
+                25,
+                Color.red(colorInt),
+                Color.green(colorInt),
+                Color.blue(colorInt)
+        );
 
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.HORIZONTAL);
@@ -583,7 +589,7 @@ public class CalendarActivity extends BaseActivity {
 
         View colorBar = new View(this);
         colorBar.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(4), LinearLayout.LayoutParams.MATCH_PARENT));
-        colorBar.setBackgroundColor(Color.parseColor(color));
+        colorBar.setBackgroundColor(colorInt);
 
         LinearLayout textContainer = new LinearLayout(this);
         textContainer.setOrientation(LinearLayout.VERTICAL);
@@ -593,7 +599,7 @@ public class CalendarActivity extends BaseActivity {
 
         GradientDrawable gd = new GradientDrawable();
         gd.setCornerRadius(dpToPx(8));
-        gd.setColor(Color.parseColor(transparentColor));
+        gd.setColor(bgColor);
         textContainer.setBackground(gd);
 
         TextView titleView = new TextView(this);
@@ -712,9 +718,22 @@ public class CalendarActivity extends BaseActivity {
         return cell;
     }
 
+    private int getTaskColor(long taskId) {
+        for (Task t : allTasksCache) {
+            if (t.id == taskId) return t.color;
+        }
+        return Color.GRAY;
+    }
+
     private LinearLayout createCompactItemView(CalendarItem item) {
-        int colorInt = ColorHelper.getColorForTitle(item.title);
-        String transparentColor = "#80" + String.format("#%06X", (0xFFFFFF & colorInt)).substring(1);
+        int colorInt = item.taskId != 0 ? getTaskColor(item.taskId) : Color.GRAY;
+
+        int bgColor = Color.argb(
+                25,
+                Color.red(colorInt),
+                Color.green(colorInt),
+                Color.blue(colorInt)
+        );
 
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.HORIZONTAL);
@@ -746,7 +765,7 @@ public class CalendarActivity extends BaseActivity {
             colorBar.setAlpha(1.0f);
         }
 
-        GradientDrawable gd = new GradientDrawable(); gd.setCornerRadius(dpToPx(6)); gd.setColor(Color.parseColor(transparentColor));
+        GradientDrawable gd = new GradientDrawable(); gd.setCornerRadius(dpToPx(6)); gd.setColor(bgColor);
         itemView.setBackground(gd);
         container.addView(colorBar); container.addView(itemView);
         container.setOnClickListener(v -> Toast.makeText(this, item.title + "\n" + item.startTime + " - " + item.endTime, Toast.LENGTH_SHORT).show());
