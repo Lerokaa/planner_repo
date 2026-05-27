@@ -35,6 +35,7 @@ public class NoteEditorActivity extends AppCompatActivity {
 
     private NoteViewModel viewModel;
     private long noteId = -1;
+    private ImageButton btnDelete;
 
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", new Locale("ru"));
     private final SimpleDateFormat fullDateFormat = new SimpleDateFormat("d MMMM yyyy, HH:mm", new Locale("ru"));
@@ -52,6 +53,12 @@ public class NoteEditorActivity extends AppCompatActivity {
         setupFormatBar();
 
         if (noteId > 0) {
+            btnDelete.setVisibility(View.VISIBLE);
+        } else {
+            btnDelete.setVisibility(View.GONE);
+        }
+
+        if (noteId > 0) {
             // 🔥 Наблюдаем за заметкой из БД
             viewModel.getNoteById(noteId).observe(this, note -> {
                 if (note != null) {
@@ -66,6 +73,26 @@ public class NoteEditorActivity extends AppCompatActivity {
         }
     }
 
+    private void deleteNote() {
+        if (noteId <= 0) return;
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Удаление")
+                .setMessage("Удалить заметку?")
+                .setPositiveButton("Удалить", (dialog, which) -> {
+
+                    Note note = new Note();
+                    note.id = noteId;
+
+                    viewModel.delete(note);
+
+                    Toast.makeText(this, "Заметка удалена", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .setNegativeButton("Отмена", null)
+                .show();
+    }
+
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         tvDate = findViewById(R.id.tvDate);
@@ -78,10 +105,13 @@ public class NoteEditorActivity extends AppCompatActivity {
         btnFormatUnderline = findViewById(R.id.btnFormatUnderline);
         btnFormatStrike = findViewById(R.id.btnFormatStrike);
         btnFormatColor = findViewById(R.id.btnFormatColor);
+        btnDelete = findViewById(R.id.btnDelete);
     }
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> saveAndClose());
+
+        btnDelete.setOnClickListener(v -> deleteNote());
 
         View.OnFocusChangeListener focusListener = (v, hasFocus) ->
                 formatBar.setVisibility(hasFocus ? View.VISIBLE : View.GONE);
