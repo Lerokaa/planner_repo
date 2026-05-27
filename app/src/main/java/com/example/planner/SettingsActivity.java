@@ -1,12 +1,13 @@
 package com.example.planner;
 
-import android.app.AlertDialog;
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -17,12 +18,17 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+
+import android.view.ViewOutlineProvider;
+import android.graphics.Outline;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -36,21 +42,28 @@ public class SettingsActivity extends BaseActivity {
 
     private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "UserPrefs";
+    private static final String PROFILE_IMAGE_NAME = "profile_image.jpg";
+    private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
 
-    private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
+    // Лаунчер для выбора фото
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Uri imageUri = result.getData().getData();
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        profileImage.setImageBitmap(bitmap);
-                        sharedPreferences.edit().putString("profile_image", imageUri.toString()).apply();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        Toast.makeText(this, "Не удалось загрузить фото", Toast.LENGTH_SHORT).show();
+                    Uri sourceUri = result.getData().getData();
+                    if (sourceUri != null) {
+                        saveImageToInternalStorage(sourceUri);
                     }
+                }
+            });
+
+    // Лаунчер для запроса разрешения на уведомления
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    setNotificationsEnabled(true);
+                    Toast.makeText(this, "Уведомления включены", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Разрешение на уведомления отклонено", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -59,11 +72,9 @@ public class SettingsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Находим корневой View и BottomNavigationView
         View rootView = findViewById(R.id.coordinatorLayout);
         bottomNav = findViewById(R.id.bottomNavigationView);
 
-        // Применяем отступы для системных баров
         setupAllInsets(rootView, bottomNav);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -73,14 +84,6 @@ public class SettingsActivity extends BaseActivity {
         setupBottomNavigation();
         setupClickListeners();
         makeImageCircle();
-    }
-
-    private void makeImageCircle() {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.OVAL);
-        drawable.setColor(getColor(R.color.light_text));
-        profileImage.setBackground(drawable);
-        profileImage.setClipToOutline(true);
     }
 
     private void initViews() {
@@ -108,12 +111,25 @@ public class SettingsActivity extends BaseActivity {
         layoutPhoto = findViewById(R.id.layoutPhoto);
     }
 
+    private void makeImageCircle() {
+        profileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        profileImage.setOutlineProvider(new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                int size = Math.min(view.getWidth(), view.getHeight());
+                outline.setRoundRect(0, 0, size, size, size / 2f);
+            }
+        });
+
+        profileImage.setClipToOutline(true);
+    }
+
     private void loadUserData() {
         String name = sharedPreferences.getString("name", "Елена");
         String surname = sharedPreferences.getString("surname", "Смирнова");
         String email = sharedPreferences.getString("email", "smirnovael@gmail.com");
         String about = sharedPreferences.getString("about", "Люблю планировать свои дела и ставить цели");
-        String imageUri = sharedPreferences.getString("profile_image", null);
 
         tvName.setText(name);
         tvSurname.setText(surname);
@@ -125,22 +141,94 @@ public class SettingsActivity extends BaseActivity {
         etEmail.setText(email);
         etAbout.setText(about);
 
-        // Скрываем возможность редактирования почты
         btnEditEmail.setVisibility(View.GONE);
         btnSaveEmail.setVisibility(View.GONE);
         etEmail.setEnabled(false);
 
-        if (imageUri != null && !imageUri.isEmpty()) {
-            try {
-                Uri uri = Uri.parse(imageUri);
-                InputStream inputStream = getContentResolver().openInputStream(uri);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        loadProfileImage();
+    }
+
+    private void loadProfileImage() {
+        File imageFile = new File(getFilesDir(), PROFILE_IMAGE_NAME);
+        if (imageFile.exists()) {
+            Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+            if (bitmap != null) {
                 profileImage.setImageBitmap(bitmap);
-            } catch (Exception e) {
-                e.printStackTrace();
+                return;
             }
         }
     }
+
+    private void saveImageToInternalStorage(Uri sourceUri) {
+        try (InputStream inputStream = getContentResolver().openInputStream(sourceUri);
+             FileOutputStream outputStream = new FileOutputStream(
+                     new File(getFilesDir(), PROFILE_IMAGE_NAME))) {
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            Toast.makeText(this, "Фото сохранено", Toast.LENGTH_SHORT).show();
+            loadProfileImage();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Ошибка сохранения фото", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // ====================== УВЕДОМЛЕНИЯ ======================
+
+    private void setupClickListeners() {
+        setupEditFunction(tvName, etName, btnEditName, btnSaveName, "name");
+        setupEditFunction(tvSurname, etSurname, btnEditSurname, btnSaveSurname, "surname");
+        setupEditFunction(tvEmail, etEmail, btnEditEmail, btnSaveEmail, "email");
+        setupEditFunction(tvAbout, etAbout, btnEditAbout, btnSaveAbout, "about");
+
+        layoutPhoto.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
+        });
+
+        // === Обработка нажатия на уведомления ===
+        layoutNotifications.setOnClickListener(v -> handleNotificationsClick());
+    }
+
+    private void handleNotificationsClick() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {  // Android 13+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Первый запрос разрешения
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                return;
+            }
+        }
+
+        // Если разрешение уже есть или Android < 13 — переключаем состояние
+        boolean currentlyEnabled = sharedPreferences.getBoolean(KEY_NOTIFICATIONS_ENABLED, true);
+        setNotificationsEnabled(!currentlyEnabled);
+    }
+
+    private void setNotificationsEnabled(boolean enabled) {
+        sharedPreferences.edit()
+                .putBoolean(KEY_NOTIFICATIONS_ENABLED, enabled)
+                .apply();
+
+        if (enabled) {
+            Toast.makeText(this, "Уведомления включены", Toast.LENGTH_SHORT).show();
+            // Здесь в будущем можно будет включить все уведомления
+        } else {
+            Toast.makeText(this, "Уведомления выключены", Toast.LENGTH_SHORT).show();
+            // Здесь можно отменить все запланированные уведомления
+        }
+    }
+
+    // ====================== Остальные методы ======================
 
     private void setupEditFunction(TextView tv, EditText et, ImageView btnEdit, ImageView btnSave, String key) {
         btnEdit.setOnClickListener(v -> {
@@ -165,53 +253,26 @@ public class SettingsActivity extends BaseActivity {
         });
     }
 
-    private void setupClickListeners() {
-        setupEditFunction(tvName, etName, btnEditName, btnSaveName, "name");
-        setupEditFunction(tvSurname, etSurname, btnEditSurname, btnSaveSurname, "surname");
-        setupEditFunction(tvEmail, etEmail, btnEditEmail, btnSaveEmail, "email");
-        setupEditFunction(tvAbout, etAbout, btnEditAbout, btnSaveAbout, "about");
-
-        layoutPhoto.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            imagePickerLauncher.launch(intent);
-        });
-
-        layoutNotifications.setOnClickListener(v -> {
-            Toast.makeText(SettingsActivity.this, "Настройки уведомлений (в разработке)", Toast.LENGTH_SHORT).show();
-        });
-    }
-
     private void setupBottomNavigation() {
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_settings);
 
             bottomNav.setOnItemSelectedListener(item -> {
                 int itemId = item.getItemId();
+                Intent intent = null;
 
-                if (itemId == R.id.nav_calendar) {
-                    startActivity(new Intent(this, CalendarActivity.class));
+                if (itemId == R.id.nav_calendar) intent = new Intent(this, CalendarActivity.class);
+                else if (itemId == R.id.nav_tasks) intent = new Intent(this, TasksActivity.class);
+                else if (itemId == R.id.nav_notes) intent = new Intent(this, NotesActivity.class);
+                else if (itemId == R.id.nav_habits) intent = new Intent(this, HabitsActivity.class);
+
+                if (intent != null) {
+                    startActivity(intent);
                     overridePendingTransition(0, 0);
                     finish();
-                    return true;
-                } else if (itemId == R.id.nav_tasks) {
-                    startActivity(new Intent(this, TasksActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                } else if (itemId == R.id.nav_notes) {
-                    startActivity(new Intent(this, NotesActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                } else if (itemId == R.id.nav_habits) {
-                    startActivity(new Intent(this, HabitsActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                } else if (itemId == R.id.nav_settings) {
                     return true;
                 }
-                return false;
+                return itemId == R.id.nav_settings;
             });
         }
     }
